@@ -7,6 +7,7 @@ import os
 
 
 
+
 User = get_user_model()
 
 class TimedAuthToken(models.Model):
@@ -62,43 +63,4 @@ class TimedAuthToken(models.Model):
 
 
 
-class SuperAdmin(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
-    email = models.EmailField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    def __str__(self):
-        return self.first_name + ' ' + self.last_name
-    
 
-class OrganisationAdmin(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
-    email = models.EmailField()
-    organisation = models.ForeignKey('Organisation', on_delete=models.CASCADE, related_name='admins')
-    created_at = models.DateTimeField(auto_now_add=True)
-    def __str__(self):
-        return self.first_name + ' ' + self.last_name
-    
-
-class ReceptionStaff(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
-    email = models.EmailField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    def __str__(self):
-        return self.first_name + ' ' + self.last_name
-    
-
-class Candidate(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
-    email = models.EmailField()
-    organisation = models.ManyToManyField('Organisation', related_name='candidates')
-    created_at = models.DateTimeField(auto_now_add=True)
-    def __str__(self):
-        return self.first_name + ' ' + self.last_name
