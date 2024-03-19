@@ -87,21 +87,35 @@ WSGI_APPLICATION = 'project.wsgi.application'
 #     }
 # }
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config("DB_HOST"),
-        'PORT': config("DB_PORT"),
-    }
-}
-
-# use db url if available on environment variables else use the default
 # DATABASES = {
-#     'default': config('DATABASE_URL', default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'), cast=db_url)
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': config('DB_NAME'),
+#         'USER': config('DB_USER'),
+#         'PASSWORD': config('DB_PASSWORD'),
+#         'HOST': config("DB_HOST"),
+#         'PORT': config("DB_PORT"),
+#     }
 # }
+
+# use database url if available in enviroment. else use one above
+
+if config('DATABASE_URL'):
+    DATABASES = {
+        'default': config('DATABASE_URL')
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': config('DB_NAME'),
+            'USER': config('DB_USER'),
+            'PASSWORD': config('DB_PASSWORD'),
+            'HOST': config("DB_HOST"),
+            'PORT': config("DB_PORT"),
+        }
+    }
+
 
 
 
