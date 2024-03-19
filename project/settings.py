@@ -98,6 +98,12 @@ DATABASES = {
     }
 }
 
+# use db url if available on environment variables else use the default
+# DATABASES = {
+#     'default': config('DATABASE_URL', default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'), cast=db_url)
+# }
+
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
