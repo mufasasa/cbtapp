@@ -102,23 +102,9 @@ WSGI_APPLICATION = 'project.wsgi.application'
 
 # use database url if available in enviroment. else use one above
 
-if config('DATABASE_URL', default=None):
-    DATABASES = {
-        'default': dj_database_url.parse(config('DATABASE_URL'))
-    }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': config('DB_NAME'),
-            'USER': config('DB_USER'),
-            'PASSWORD': config('DB_PASSWORD'),
-            'HOST': config("DB_HOST"),
-            'PORT': config("DB_PORT"),
-        }
-    }
-
-
+DATABASES = {
+    'default': dj_database_url.parse(config('DATABASE_URL'))
+}
 
 
 # Password validation
