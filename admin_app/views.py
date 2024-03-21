@@ -95,7 +95,6 @@ class SuperAdminListCreateView(generics.ListCreateAPIView):
 
     # create a new super admin
     def post(self, request):
-        serializer = SuperAdminSerializer(data=request.data)
 
         # create a new user
         user = get_user_model().objects.create_user(
@@ -105,12 +104,24 @@ class SuperAdminListCreateView(generics.ListCreateAPIView):
         )
 
         # create a new super admin
-        if serializer.is_valid():
-            serializer.save(user=user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+        super_admin = SuperAdmin.objects.create(
+            user=user,
+            first_name=request.data['first_name'],
+            last_name=request.data['last_name'],
+            email=request.data['email']
+        )
+
+        super_admin.save()
+
+        return Response(
+            {
+                'id': str(super_admin.id),
+                'first_name': super_admin.first_name,
+                'last_name': super_admin.last_name,
+                'email': super_admin.email
+            }, 
+            status=status.HTTP_201_CREATED
+        )
 
 
 class SuperAdminDetailView(generics.RetrieveUpdateDestroyAPIView):
