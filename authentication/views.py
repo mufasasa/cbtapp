@@ -20,7 +20,10 @@ class LoginView(generics.CreateAPIView):
         serializer = LoginSerializer(data=request.data)
 
         if serializer.is_valid():
-            user = get_user_model().objects.get(username=request.data['username'])
+            user = get_user_model().objects.filter(username=request.data['username'])
+            if not user.exists():
+                return Response({'error': 'Invalid username'}, status=status.HTTP_400_BAD_REQUEST)
+            user = user.first()
             # validate the password
             if not user.check_password(request.data['password']):
                 return Response({'error': 'Invalid password'}, status=status.HTTP_400_BAD_REQUEST)
