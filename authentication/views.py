@@ -5,6 +5,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from .models import *
 from django.contrib.auth import get_user_model
 from .serializers import *
+from authentication.authentication import *
 
 
 
@@ -33,8 +34,8 @@ class LoginView(generics.CreateAPIView):
 
 class ResetPasswordView(generics.CreateAPIView):
     serializer_class = LoginSerializer
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [TimedAuthToken]
+    # permission_classes = [IsAuthenticated]
+    # authentication_classes = [TimedAuthTokenAuthentication]
 
     # reset the password of a user
     def post(self, request):

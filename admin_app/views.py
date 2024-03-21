@@ -6,7 +6,8 @@ from rest_framework.response import Response
 from rest_framework import generics
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from authentication.models import TimedAuthToken
+# from authentication.models import TimedAuthToken
+from authentication.authentication import TimedAuthTokenAuthentication
 
 
 
@@ -15,7 +16,7 @@ class OrganisationAdminListCreateView(generics.ListCreateAPIView):
     queryset = OrganisationAdmin.objects.all()
     serializer_class = OrganisationAdminSerializer
     permission_classes = [IsAuthenticated]
-    authentication_classes = [TimedAuthToken]
+    authentication_classes = [TimedAuthTokenAuthentication]
 
     # list all organisation admins
     def get(self, request):
@@ -48,7 +49,7 @@ class OrganisationAdminDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = OrganisationAdmin.objects.all()
     serializer_class = OrganisationAdminSerializer
     permission_classes = [IsAuthenticated]
-    authentication_classes = [TimedAuthToken]
+    authentication_classes = [TimedAuthTokenAuthentication]
 
     # retrieve an organisation admin
     def get(self, request, pk):
@@ -82,8 +83,8 @@ class OrganisationAdminDetailView(generics.RetrieveUpdateDestroyAPIView):
 class SuperAdminListCreateView(generics.ListCreateAPIView):
     queryset = SuperAdmin.objects.all()
     serializer_class = SuperAdminSerializer
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [TimedAuthToken]
+    # permission_classes = [IsAuthenticated]
+    # authentication_classes = [TimedAuthTokenAuthentication]
 
     # list all super admins
     def get(self, request):
@@ -116,7 +117,7 @@ class SuperAdminDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = SuperAdmin.objects.all()
     serializer_class = SuperAdminSerializer
     permission_classes = [IsAuthenticated]
-    authentication_classes = [TimedAuthToken]
+    authentication_classes = [TimedAuthTokenAuthentication]
 
     # retrieve a super admin
     def get(self, request, pk):
@@ -149,7 +150,7 @@ class ReceptionStaffListCreateView(generics.ListCreateAPIView):
     queryset = ReceptionStaff.objects.all()
     serializer_class = ReceptionStaffSerializer
     permission_classes = [IsAuthenticated]
-    authentication_classes = [TimedAuthToken]
+    authentication_classes = [TimedAuthTokenAuthentication]
 
     # list all reception staff
     def get(self, request):
@@ -182,7 +183,7 @@ class ReceptionStaffDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = ReceptionStaff.objects.all()
     serializer_class = ReceptionStaffSerializer
     permission_classes = [IsAuthenticated]
-    authentication_classes = [TimedAuthToken]
+    authentication_classes = [TimedAuthTokenAuthentication]
 
     # retrieve a reception staff
     def get(self, request, pk):
