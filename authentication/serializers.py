@@ -6,7 +6,7 @@ from admin_app.models import *
 
 
 class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField()
+    email = serializers.CharField()
     password = serializers.CharField()
 
 
