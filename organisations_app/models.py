@@ -7,7 +7,7 @@ User = get_user_model()
 
 
 class Organisation(models.Model):
-    idd = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100)
     address = models.CharField(max_length=100)
     phone = models.CharField(max_length=100)
@@ -23,7 +23,7 @@ class Organisation(models.Model):
 
 
 class OrganisationAdmin(models.Model):
-    idd = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
