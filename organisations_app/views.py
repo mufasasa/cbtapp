@@ -133,7 +133,7 @@ class OrganisationListCreateExamsView(generics.ListCreateAPIView):
         if not user_is_staff_of_organization(request.user, Organisation.objects.get(pk=organisation_id)):
             return Response(status=status.HTTP_403_FORBIDDEN)
         
-        organisation = Organisation.objects.get(pk=pk)
+        organisation = Organisation.objects.get(pk=organisation_id)
         exams = organisation.examinations.all()
         serializer = ExaminationSerializer(exams, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
