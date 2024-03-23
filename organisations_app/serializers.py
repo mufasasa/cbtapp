@@ -52,3 +52,29 @@ class CreateExamSerializer(serializers.Serializer):
             exam.candidates.add(Candidate.objects.get(pk=candidate))
 
         return exam
+    
+
+class OrganisationCreateSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    address = serializers.CharField()
+    phone = serializers.CharField()
+    email = serializers.EmailField()
+    password = serializers.CharField()
+    website = serializers.URLField(required=False)
+    logo = serializers.ImageField(required=False)
+
+    def create(self, validated_data):
+        return Organisation.objects.create(
+            name=validated_data['name'],
+            address=validated_data['address'],
+            phone=validated_data['phone'],
+            email=validated_data['email'],
+            website=validated_data.get('website'),
+            logo=validated_data.get('logo')
+        )
+    
+
+class OrganisationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Organisation
+        fields = '__all__'

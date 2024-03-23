@@ -14,6 +14,49 @@ from authentication.utils  import user_is_in_entity, get_user_entity_instance, u
 
 
 
+
+
+
+class OrganisationListCreateView(generics.ListCreateAPIView):
+    queryset = Organisation.objects.all()
+    serializer_class = OrganisationCreateSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TimedAuthToken]
+
+    # list all organisations
+    def get(self, request):
+        organisations = Organisation.objects.all()
+        serializer = OrganisationCreateSerializer(organisations, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+    # create a new organisation
+    def post(self, request):
+        serializer = OrganisationCreateSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+
+            # create a new user
+            user = get_user_model().objects.create_user(
+                username=request.data['email'],
+                password=request.data['password'],
+                email=request.data['email']
+            )
+
+            # create a new organisation admin
+            OrganisationAdmin.objects.create(
+                user=user,
+                organisation=Organisation.objects.get(pk=serializer.data['id'])
+            )
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
 class CandidateListCreateView(generics.ListCreateAPIView):
     queryset = Candidate.objects.all()
     serializer_class = CandidateSerializer
