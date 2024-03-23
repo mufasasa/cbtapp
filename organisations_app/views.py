@@ -20,8 +20,8 @@ from authentication.utils  import user_is_in_entity, get_user_entity_instance, u
 class OrganisationListCreateView(generics.ListCreateAPIView):
     queryset = Organisation.objects.all()
     serializer_class = OrganisationCreateSerializer
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [TimedAuthToken]
+    # permission_classes = [IsAuthenticated]
+    # authentication_classes = [TimedAuthToken]
 
     # list all organisations
     def get(self, request):
