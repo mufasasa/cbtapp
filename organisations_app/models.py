@@ -34,3 +34,20 @@ class OrganisationAdmin(models.Model):
     def __str__(self):
         return self.first_name + ' ' + self.last_name
     
+
+
+class Examination(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True, null=True)
+    duration = models.IntegerField()
+    instructions = models.TextField()
+    total_marks = models.IntegerField()
+    passing_marks = models.IntegerField()
+    questions = models.JSONField(default=list)
+    candidates = models.ManyToManyField('candidates_app.Candidate', related_name='examinations', blank=True)
+    organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE, related_name='examinations')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    def __str__(self):
+        return self.name

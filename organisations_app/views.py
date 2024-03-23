@@ -6,6 +6,8 @@ from rest_framework import generics
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from authentication.models import TimedAuthToken
+from authentication.utils  import user_is_in_entity, get_user_entity_instance, user_is_staff_of_organization
+
 
 
 
@@ -74,4 +76,77 @@ class CandidateDetailView(generics.RetrieveUpdateDestroyAPIView):
     def delete(self, request, pk):
         candidate = Candidate.objects.get(pk=pk)
         candidate.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
+class OrganisationListCreateExamsView(generics.ListCreateAPIView):
+    queryset = Organisation.objects.all()
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TimedAuthToken]
+
+    # list all exams of an organisation
+    def get(self, request, organisation_id):
+        if not user_is_staff_of_organization(request.user, Organisation.objects.get(pk=organisation_id)):
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
+        organisation = Organisation.objects.get(pk=pk)
+        exams = organisation.examinations.all()
+        serializer = ExaminationSerializer(exams, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+    # create a new exam for an organisation
+    def post(self, request, organisation_id):
+        if not user_is_staff_of_organization(request.user, Organisation.objects.get(pk=organisation_id)):
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
+        serializer = CreateExamSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+
+class OrganisationExaminationDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Examination.objects.all()
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TimedAuthToken]
+
+    # retrieve an examination
+    def get(self, request, organisation_id, exam_id):
+        if not user_is_staff_of_organization(request.user, Organisation.objects.get(pk=organisation_id)):
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
+        exam = Examination.objects.get(pk=exam_id)
+        serializer = ExaminationSerializer(exam)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+    # update an examination
+    def put(self, request, organisation_id, exam_id):
+        if not user_is_staff_of_organization(request.user, Organisation.objects.get(pk=organisation_id)):
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
+        exam = Examination.objects.get(pk=exam_id)
+        serializer = CreateExamSerializer(exam, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+    # delete an examination
+    def delete(self, request, organisation_id, exam_id):
+        if not user_is_staff_of_organization(request.user, Organisation.objects.get(pk=organisation_id)):
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
+        exam = Examination.objects.get(pk=exam_id)
+        exam.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
