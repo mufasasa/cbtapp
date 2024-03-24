@@ -63,15 +63,6 @@ class OrganisationCreateSerializer(serializers.Serializer):
     website = serializers.URLField(required=False)
     logo = serializers.ImageField(required=False)
 
-    def create(self, validated_data):
-        return Organisation.objects.create(
-            name=validated_data['name'],
-            address=validated_data['address'],
-            phone=validated_data['phone'],
-            email=validated_data['email'],
-            website=validated_data.get('website'),
-            logo=validated_data.get('logo')
-        )
     
 
 class OrganisationSerializer(serializers.ModelSerializer):

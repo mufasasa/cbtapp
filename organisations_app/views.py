@@ -35,28 +35,36 @@ class OrganisationListCreateView(generics.ListCreateAPIView):
         serializer = OrganisationCreateSerializer(data=request.data)
 
         if serializer.is_valid():
-            serializer.save()
 
-            # if user exists, return error, user with email already exists
             user = get_user_model().objects.filter(username=request.data['email'])
             if user.exists():
                 return Response({'error': 'User with email already exists'}, status=status.HTTP_400_BAD_REQUEST)
             
-            else:
-            # create a new user
-                user = get_user_model().objects.create_user(
-                    username=request.data['email'],
-                    password=request.data['password'],
-                    email=request.data['email']
-                )
+            # create a new organisation
+            organisation_instance = Organisation.objects.create(
+                name=request.data['name'],
+                address=request.data['address'],
+                phone=request.data['phone'],
+                email=request.data['email'],
+                website=request.data['website'] if 'website' in request.data else None,
+                logo = request.data['logo'] if 'logo' in request.data else None
+            )
 
-                # create a new organisation admin
-                OrganisationAdmin.objects.create(
-                    user=user,
-                    organisation=Organisation.objects.get(pk=serializer.data['id'])
-                )
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-        
+            # create a new user
+            user = get_user_model().objects.create_user(
+                username=request.data['email'],
+                password=request.data['password'],
+                email=request.data['email']
+            )
+
+            # create a new organisation admin
+            organisation_admin = OrganisationAdmin.objects.create(
+                user=user,
+                organisation=organisation_instance
+            )
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
