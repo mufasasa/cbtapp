@@ -26,7 +26,7 @@ class OrganisationListCreateView(generics.ListCreateAPIView):
     # list all organisations
     def get(self, request):
         organisations = Organisation.objects.all()
-        serializer = OrganisationCreateSerializer(organisations, many=True)
+        serializer = OrganisationSerializer(organisations, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
 
