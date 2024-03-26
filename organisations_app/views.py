@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework import generics
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from authentication.models import TimedAuthToken
+from authentication.authentication import TimedAuthTokenAuthentication
 from authentication.utils  import user_is_in_entity, get_user_entity_instance, user_is_staff_of_organization
 
 
@@ -72,7 +72,7 @@ class CandidateListCreateView(generics.ListCreateAPIView):
     queryset = Candidate.objects.all()
     serializer_class = CandidateSerializer
     permission_classes = [IsAuthenticated]
-    authentication_classes = [TimedAuthToken]
+    authentication_classes = [TimedAuthTokenAuthentication]
 
     # list all candidates
     def get(self, request):
@@ -105,7 +105,7 @@ class CandidateDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Candidate.objects.all()
     serializer_class = CandidateSerializer
     permission_classes = [IsAuthenticated]
-    authentication_classes = [TimedAuthToken]
+    authentication_classes = [TimedAuthTokenAuthentication]
 
     # retrieve a candidate
     def get(self, request, pk):
@@ -137,7 +137,7 @@ class CandidateDetailView(generics.RetrieveUpdateDestroyAPIView):
 class OrganisationListCreateExamsView(generics.ListCreateAPIView):
     queryset = Organisation.objects.all()
     permission_classes = [IsAuthenticated]
-    authentication_classes = [TimedAuthToken]
+    authentication_classes = [TimedAuthTokenAuthentication]
 
     # list all exams of an organisation
     def get(self, request, organisation_id):
@@ -151,7 +151,7 @@ class OrganisationListCreateExamsView(generics.ListCreateAPIView):
     
 
     # create a new exam for an organisation
-    def post(self, request, organisation_id):
+    def create(self, request, organisation_id):
         if not user_is_staff_of_organization(request.user, Organisation.objects.get(pk=organisation_id)):
             return Response(status=status.HTTP_403_FORBIDDEN)
         
@@ -169,7 +169,7 @@ class OrganisationListCreateExamsView(generics.ListCreateAPIView):
 class OrganisationExaminationDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Examination.objects.all()
     permission_classes = [IsAuthenticated]
-    authentication_classes = [TimedAuthToken]
+    authentication_classes = [TimedAuthTokenAuthentication]
 
     # retrieve an examination
     def get(self, request, organisation_id, exam_id):
