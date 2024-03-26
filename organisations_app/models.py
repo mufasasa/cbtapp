@@ -40,6 +40,8 @@ class Examination(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
+    start_time = models.DateTimeField(blank=True, null=True)
+    end_time = models.DateTimeField(blank=True, null=True)
     duration = models.IntegerField(blank=True, null=True)
     instructions = models.TextField(blank=True, null=True)
     total_marks = models.IntegerField(blank=True, null=True)

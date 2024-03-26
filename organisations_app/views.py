@@ -187,13 +187,21 @@ class OrganisationExaminationDetailView(generics.RetrieveUpdateDestroyAPIView):
             return Response(status=status.HTTP_403_FORBIDDEN)
         
         exam = Examination.objects.get(pk=exam_id)
-        serializer = CreateExamSerializer(exam, data=request.data)
 
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+        # update an examination
+        exam.name = request.data['name'] if 'name' in request.data else exam.name
+        exam.description = request.data['description'] if 'description' in request.data else exam.description
+        exam.start_time = request.data['start_time'] if 'start_time' in request.data else exam.start_time
+        exam.end_time = request.data['end_time'] if 'end_time' in request.data else exam.end_time
+        exam.duration = request.data['duration'] if 'duration' in request.data else exam.duration
+        exam.instructions = request.data['instructions'] if 'instructions' in request.data else exam.instructions
+        exam.total_marks = request.data['total_marks'] if 'total_marks' in request.data else exam.total_marks
+        exam.passing_marks = request.data['passing_marks'] if 'passing_marks' in request.data else exam.passing_marks
+        exam.questions = request.data['questions'] if 'questions' in request.data else exam.questions
+        exam.save()
+
         
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"message":"exam update successfull"},status=status.HTTP_200_OK)
     
 
     # delete an examination
