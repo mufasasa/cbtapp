@@ -35,6 +35,7 @@ class CreateExamSerializer(serializers.Serializer):
     organisation = serializers.UUIDField()
 
     def create(self, validated_data):
+        organisation = Organisation.objects.get(pk=validated_data['organisation'])
         exam = Examination.objects.create(
             name=validated_data['name'],
             description=validated_data['description'] if 'description' in validated_data else None,
@@ -42,14 +43,15 @@ class CreateExamSerializer(serializers.Serializer):
             end_time=validated_data['end_time'] if 'end_time' in validated_data else None,
             duration=validated_data['duration'] if 'duration' in validated_data else None,
             instructions=validated_data['instructions'] if 'instructions' in validated_data else None,
-            questions=validated_data['questions'] if 'questions' in validated_data else None,
+            questions=validated_data.get('questions', []),
             total_marks=validated_data['total_marks'] if 'total_marks' in validated_data else None,
             passing_marks=validated_data['passing_marks'] if 'passing_marks' in validated_data else None,
-            organisation=Organisation.objects.get(pk=validated_data['organisation'])
+            organisation=organisation
         )
         if 'candidates' in validated_data:
-            for candidate in validated_data['candidates']:
-                exam.candidates.add(Candidate.objects.get(pk=candidate))
+            for candidate_id in validated_data['candidates']:
+                candidate = Candidate.objects.get(pk=candidate_id)
+                exam.candidates.add(candidate)
 
         return exam
     
