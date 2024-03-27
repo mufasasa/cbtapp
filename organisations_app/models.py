@@ -46,7 +46,7 @@ class Examination(models.Model):
     instructions = models.TextField(blank=True, null=True)
     total_marks = models.IntegerField(blank=True, null=True)
     passing_marks = models.IntegerField(blank=True, null=True)
-    questions = models.JSONField(default=list)
+    questions = models.JSONField(default=list, blank=True, null=True)
     candidates = models.ManyToManyField('candidates_app.Candidate', related_name='examinations', blank=True)
     organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE, related_name='examinations')
     created_at = models.DateTimeField(auto_now_add=True)
