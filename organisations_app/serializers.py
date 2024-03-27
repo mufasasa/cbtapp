@@ -37,14 +37,14 @@ class CreateExamSerializer(serializers.Serializer):
     def create(self, validated_data):
         exam = Examination.objects.create(
             name=validated_data['name'],
-            description=validated_data['description'],
-            start_time=validated_data['start_time'],
-            end_time=validated_data['end_time'],
-            duration=validated_data['duration'],
-            instructions=validated_data['instructions'],
-            questions=validated_data['questions'],
-            total_marks=validated_data['total_marks'],
-            passing_marks=validated_data['passing_marks'],
+            description=validated_data['description'] if 'description' in validated_data else None,
+            start_time=validated_data['start_time'] if 'start_time' in validated_data else None,
+            end_time=validated_data['end_time'] if 'end_time' in validated_data else None,
+            duration=validated_data['duration'] if 'duration' in validated_data else None,
+            instructions=validated_data['instructions'] if 'instructions' in validated_data else None,
+            questions=validated_data['questions'] if 'questions' in validated_data else None,
+            total_marks=validated_data['total_marks'] if 'total_marks' in validated_data else None,
+            passing_marks=validated_data['passing_marks'] if 'passing_marks' in validated_data else None,
             organisation=Organisation.objects.get(pk=validated_data['organisation'])
         )
 
