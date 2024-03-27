@@ -47,9 +47,9 @@ class CreateExamSerializer(serializers.Serializer):
             passing_marks=validated_data['passing_marks'] if 'passing_marks' in validated_data else None,
             organisation=Organisation.objects.get(pk=validated_data['organisation'])
         )
-
-        for candidate in validated_data['candidates']:
-            exam.candidates.add(Candidate.objects.get(pk=candidate))
+        if 'candidates' in validated_data:
+            for candidate in validated_data['candidates']:
+                exam.candidates.add(Candidate.objects.get(pk=candidate))
 
         return exam
     
