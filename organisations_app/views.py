@@ -148,6 +148,7 @@ class OrganisationListCreateExamsView(generics.ListCreateAPIView):
         
         organisation = Organisation.objects.get(pk=organisation_id)
         exams = organisation.examinations.all()
+
         page = self.paginator.paginate_queryset(exams, request)
         if page is not None:
             serializer = ExaminationSerializer(page, many=True)
@@ -166,7 +167,7 @@ class OrganisationListCreateExamsView(generics.ListCreateAPIView):
 
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response({"message":"successfull"}, status=status.HTTP_201_CREATED)
         
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
