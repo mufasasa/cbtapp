@@ -26,7 +26,7 @@ class CreateExamSerializer(serializers.Serializer):
     description = serializers.CharField(required=False)
     start_time = serializers.DateTimeField()
     end_time = serializers.DateTimeField()
-    duration = serializers.DurationField(required=False)
+    duration = serializers.IntegerField(required=False)
     instructions = serializers.CharField(required=False)
     total_marks = serializers.IntegerField(required=False)
     passing_marks = serializers.IntegerField(required=False)
