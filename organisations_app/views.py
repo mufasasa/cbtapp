@@ -7,7 +7,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from authentication.authentication import TimedAuthTokenAuthentication
 from authentication.utils  import user_is_in_entity, get_user_entity_instance, user_is_staff_of_organization
-
+from rest_framework.pagination import PageNumberPagination
 
 
 
@@ -139,6 +139,8 @@ class OrganisationListCreateExamsView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [TimedAuthTokenAuthentication]
 
+    paginator = PageNumberPagination()
+
     # list all exams of an organisation
     def get(self, request, organisation_id):
         if not user_is_staff_of_organization(request.user, Organisation.objects.get(pk=organisation_id)):
@@ -146,6 +148,11 @@ class OrganisationListCreateExamsView(generics.ListCreateAPIView):
         
         organisation = Organisation.objects.get(pk=organisation_id)
         exams = organisation.examinations.all()
+        page = self.paginator.paginate_queryset(exams, request)
+        if page is not None:
+            serializer = ExaminationSerializer(page, many=True)
+            return self.paginator.get_paginated_response(serializer.data)
+        
         serializer = ExaminationSerializer(exams, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
