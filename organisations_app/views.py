@@ -210,7 +210,7 @@ class OrganisationExaminationDetailView(generics.RetrieveUpdateDestroyAPIView):
         exam.save()
 
         
-        return Response({"message":"exam update successfull"},status=status.HTTP_200_OK)
+        return Response({"message":"exam update successfull", "id":str(exam.id)},status=status.HTTP_200_OK)
     
 
     # delete an examination
