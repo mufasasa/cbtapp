@@ -166,8 +166,9 @@ class OrganisationListCreateExamsView(generics.ListCreateAPIView):
         serializer = CreateExamSerializer(data=request.data)
 
         if serializer.is_valid():
-            serializer.save()
-            return Response({"message":"successfull"}, status=status.HTTP_201_CREATED)
+            exam = serializer.save()
+            exam_id = exam.id
+            return Response({"message":"successfull", "id":exam_id}, status=status.HTTP_201_CREATED)
         
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
