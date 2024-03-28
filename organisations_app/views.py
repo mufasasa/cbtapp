@@ -206,7 +206,12 @@ class OrganisationExaminationDetailView(generics.RetrieveUpdateDestroyAPIView):
         exam.instructions = request.data['instructions'] if 'instructions' in request.data else exam.instructions
         exam.total_marks = request.data['total_marks'] if 'total_marks' in request.data else exam.total_marks
         exam.passing_marks = request.data['passing_marks'] if 'passing_marks' in request.data else exam.passing_marks
-        exam.questions = request.data['questions'] if 'questions' in request.data else exam.questions
+
+        questions = request.data['questions'] if 'questions' in request.data else []
+        sorted_questions = []
+        if questions:
+            sorted_questions = sorted(questions, key=lambda x: x['created_at'], reverse=True)
+        exam.questions = sorted_questions if sorted_questions else exam.questions
         exam.save()
 
         
