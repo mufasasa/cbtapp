@@ -149,6 +149,9 @@ class OrganisationListCreateExamsView(generics.ListCreateAPIView):
         organisation = Organisation.objects.get(pk=organisation_id)
         exams = organisation.examinations.all()
 
+        # sort exams by created_at, in descending order
+        exams = exams.order_by('-created_at')
+
         page = self.paginator.paginate_queryset(exams, request)
         if page is not None:
             serializer = ExaminationSerializer(page, many=True)
