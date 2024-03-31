@@ -12,7 +12,11 @@ class Candidate(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
+    nin = models.CharField(max_length=100, blank=True, null=True)
     email = models.EmailField()
+    phone = models.CharField(max_length=100, blank=True, null=True)
+    phone2 = models.CharField(max_length=100, blank=True, null=True)
+    photo = models.ImageField(upload_to='photos/', blank=True, null=True)
     organisation = models.ManyToManyField(Organisation, related_name='candidates')
     created_at = models.DateTimeField(auto_now_add=True)
     def __str__(self):

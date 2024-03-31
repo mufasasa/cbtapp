@@ -5,6 +5,17 @@ import uuid
 
 User = get_user_model()
 
+EXAM_STATUS = (
+    ('draft', 'Draft'),
+    ('pending', 'Pending'),
+    ('approved', 'Approved'),
+    ('in_progress', 'In Progress'),
+    ('completed', 'Completed'),
+    ('cancelled', 'Cancelled'),
+    ('archived', 'Archived'),
+)
+
+
 
 
 class Organisation(models.Model):
@@ -49,6 +60,7 @@ class Examination(models.Model):
     questions = models.JSONField(default=list, blank=True, null=True)
     candidates = models.ManyToManyField('candidates_app.Candidate', related_name='examinations', blank=True)
     organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE, related_name='examinations')
+    status = models.CharField(max_length=100, choices=EXAM_STATUS, default='draft')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):

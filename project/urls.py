@@ -39,6 +39,7 @@ urlpatterns = [
     path('organisations/', include('organisations_app.urls')),
     path('candidates/', include('candidates_app.urls')),
     path('admins/', include('admin_app.urls')),
+    path('utills/', include('utills_app.urls')),
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     re_path(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),

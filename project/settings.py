@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'organisations_app',
     'candidates_app',
     'admin_app',
+    'utills_app',
     'drf_yasg',
     'django.contrib.admin',
     'django.contrib.auth',

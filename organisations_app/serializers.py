@@ -71,3 +71,11 @@ class OrganisationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Organisation
         fields = '__all__'
+
+class OrganisationCreateCandidateSerializer(serializers.Serializer):
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    nin = serializers.CharField()
+    email = serializers.EmailField()
+    phone_number_1 = serializers.CharField()
+    phone_number_2 = serializers.CharField(required=False)
