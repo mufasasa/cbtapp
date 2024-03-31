@@ -295,7 +295,7 @@ class OrganisationListCreateCandidatesView(generics.ListCreateAPIView):
         # create a new user
         user = get_user_model().objects.create_user(
             username=request.data['email'],
-            password=request.data['password'],
+            password='0000',
             email=request.data['email']
         )
 
