@@ -228,7 +228,7 @@ class OrganisationExaminationDetailView(generics.RetrieveUpdateDestroyAPIView):
     
 
 
-class OrganusationArchiveExaminationView(generics.UpdateAPIView):
+class OrganisationArchiveExaminationView(generics.UpdateAPIView):
     queryset = Examination.objects.all()
     permission_classes = [IsAuthenticated]
     authentication_classes = [TimedAuthTokenAuthentication]
