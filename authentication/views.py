@@ -72,7 +72,7 @@ class LoginView(generics.CreateAPIView):
 
             
             
-            token, created = TimedAuthToken.objects.create(user=user)
+            token = TimedAuthToken.objects.create(user=user)
             return Response({'token': token.key, 'entities':entities}, status=status.HTTP_200_OK)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
