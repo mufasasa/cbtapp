@@ -309,8 +309,8 @@ class OrganisationListCreateCandidatesView(generics.ListCreateAPIView):
             phone=request.data['phone'],
             phone2=request.data['phone2'] if 'phone2' in request.data else None,
             photo=request.data['photo'] if 'photo' in request.data else None,
-            organisation=organisation_instance
         )
+        canditate_instance.organisation.set([organisation_instance])
 
         
         return Response({
