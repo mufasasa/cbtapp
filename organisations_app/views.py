@@ -290,14 +290,16 @@ class OrganisationListCreateCandidatesView(generics.ListCreateAPIView):
         # check if user with email already exists
         user = get_user_model().objects.filter(username=request.data['email'])
         if user.exists():
-            return Response({'error': 'User with email already exists'}, status=status.HTTP_400_BAD_REQUEST)
+            user = user.first()
+
+        else:
         
-        # create a new user
-        user = get_user_model().objects.create_user(
-            username=request.data['email'],
-            password='0000',
-            email=request.data['email']
-        )
+            # create a new user
+            user = get_user_model().objects.create_user(
+                username=request.data['email'],
+                password='0000',
+                email=request.data['email']
+            )
 
         # create a new candidate
         canditate_instance = Candidate.objects.create(
