@@ -150,6 +150,9 @@ class OrganisationListCreateExamsView(generics.ListCreateAPIView):
         organisation = Organisation.objects.get(pk=organisation_id)
         exams = organisation.examinations.all()
 
+        if request.query_params.get('status'):
+            exams = exams.filter(status=request.query_params.get('status'))
+
         # sort exams by created_at, in descending order
         exams = exams.order_by('-created_at')
 
@@ -277,6 +280,7 @@ class OrganisationListCreateCandidatesView(generics.ListCreateAPIView):
     serializer_class = CandidateSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = [TimedAuthTokenAuthentication]
+    paginator = PageNumberPagination()
 
     # create a new candidate
     def post(self, request, organisation_id):
@@ -328,6 +332,15 @@ class OrganisationListCreateCandidatesView(generics.ListCreateAPIView):
             return Response(status=status.HTTP_403_FORBIDDEN)
         
         candidates = organisation_instance.candidates.all()
+        if request.query_params.get('name'):
+            # search for either first name or last name containig name
+            candidates = candidates.filter(first_name__icontains=request.query_params.get('name')) | candidates.filter(last_name__icontains=request.query_params.get('name'))
+
+        page = self.paginator.paginate_queryset(candidates, request)
+        if page is not None:
+            serializer = CandidateSerializer(page, many=True)
+            return self.paginator.get_paginated_response(serializer.data)
+        
         serializer = CandidateSerializer(candidates, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
