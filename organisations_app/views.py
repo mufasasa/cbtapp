@@ -394,3 +394,33 @@ class OrganisationCandidateDetailView(generics.RetrieveUpdateDestroyAPIView):
         candidate = Candidate.objects.get(pk=candidate_id)
         candidate.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
+class OrganisationGetExamCandidatesView(generics.ListAPIView):
+    # get all candidates of an exam include pagination and search
+    queryset = Examination.objects.all()
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TimedAuthTokenAuthentication]
+    paginator = PageNumberPagination()
+
+
+    def get(self, request, organisation_id, exam_id):
+        organisation_instance = Organisation.objects.get(pk=organisation_id)
+        if not user_is_staff_of_organization(request.user, organisation_instance):
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
+        exam = Examination.objects.get(pk=exam_id)
+        candidates = exam.candidates.all()
+
+        if request.query_params.get('name'):
+            # search for either first name or last name containig name
+            candidates = candidates.filter(first_name__icontains=request.query_params.get('name')) | candidates.filter(last_name__icontains=request.query_params.get('name'))
+
+        page = self.paginator.paginate_queryset(candidates, request)
+        if page is not None:
+            serializer = CandidateSerializer(page, many=True)
+            return self.paginator.get_paginated_response(serializer.data)
+        
+        serializer = CandidateSerializer(candidates, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

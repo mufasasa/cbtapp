@@ -21,6 +21,14 @@ class ExaminationSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ExaminationDetailSerializer(serializers.ModelSerializer):
+    candidates = CandidateSerializer(many=True)
+    
+    class Meta:
+        model = Examination
+        fields = '__all__'
+        
+
 class CreateExamSerializer(serializers.Serializer):
     name = serializers.CharField()
     description = serializers.CharField(required=False)
