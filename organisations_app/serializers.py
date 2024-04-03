@@ -27,7 +27,7 @@ class ExaminationDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Examination
         fields = '__all__'
-        
+
 
 class CreateExamSerializer(serializers.Serializer):
     name = serializers.CharField()
@@ -56,11 +56,11 @@ class CreateExamSerializer(serializers.Serializer):
             passing_marks=validated_data['passing_marks'] if 'passing_marks' in validated_data else None,
             organisation=organisation
         )
-        # if 'candidates' in validated_data:
-        #     for candidate_id in validated_data['candidates']:
-        #         candidate = Candidate.objects.get(pk=candidate_id)
-        #         exam.candidates.add(candidate)
-
+        # add the candidates, which is a many to many field
+        if 'candidates' in validated_data:
+            for candidate_id in validated_data['candidates']:
+                candidate = Candidate.objects.get(pk=candidate_id)
+                exam.candidates.add(candidate)
         return exam
     
 
