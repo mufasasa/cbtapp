@@ -8,7 +8,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 # from authentication.models import TimedAuthToken
 from authentication.authentication import TimedAuthTokenAuthentication
-from organisations_app.serializers import OrganisationSerializer
+from organisations_app.serializers import *
 
 
 
@@ -263,4 +263,40 @@ class SuperAdminDeactivateOrganisationView(generics.UpdateAPIView):
         organisation = Organisation.objects.get(id=organisation_id)
         organisation.active = False
         organisation.save()
+        return Response(status=status.HTTP_200_OK)
+    
+
+
+class SuperAdminGetAllComplainsView(generics.ListAPIView):
+    queryset = OrganisationComplain.objects.all()
+    serializer_class = OrganisationComplainSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TimedAuthTokenAuthentication]
+
+    # list all complains
+    def get(self, request):
+        complains = OrganisationComplain.objects.all()
+        serializer = OrganisationComplainSerializer(complains, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+class SuperAdminGetComplainView(generics.RetrieveUpdateAPIView):
+
+    queryset = OrganisationComplain.objects.all()
+    serializer_class = OrganisationComplainSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TimedAuthTokenAuthentication]
+
+    # retrieve a complain
+    def get(self, request, complain_id):
+        complain = OrganisationComplain.objects.get(id=complain_id)
+        serializer = OrganisationComplainSerializer(complain)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+    # update a complain status
+    def put(self, request, complain_id):
+        complain = OrganisationComplain.objects.get(id=complain_id)
+        complain.status = request.data['status']
+        complain.save()
         return Response(status=status.HTTP_200_OK)

@@ -15,4 +15,7 @@ urlpatterns = [
     path('organisation/<uuid:organisation_id>/candidates/',OrganisationListCreateCandidatesView.as_view(), name='organisation_candidates'),
     path('organisation/<uuid:organisation_id>/candidates/<uuid:candidate_id>/', OrganisationCandidateDetailView.as_view(), name='organisation_candidate_detail'),
 
+    path('organisation/<uuid:organisation_id>/complains/', OrganisationComplainListCreateView.as_view(), name='organisation_complains'),
+    path('organisation/<uuid:organisation_id>/complains/<uuid:complain_id>/', OrganisationComplainDetailView.as_view(), name='organisation_complain_detail'),
+
 ]

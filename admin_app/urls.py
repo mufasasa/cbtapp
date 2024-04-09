@@ -12,4 +12,7 @@ urlpatterns = [
     path('reception_staff/<uuid:pk>/', ReceptionStaffDetailView.as_view(), name='reception_staff_detail'),
     path('organisation/<uuid:organisation_id>/activate/', SuperAdminActivateOrganisationView.as_view(), name='activate_organisation'),
     path('organisation/<uuid:organisation_id>/deactivate/', SuperAdminDeactivateOrganisationView.as_view(), name='deactivate_organisation'),
+    path('complains/', SuperAdminGetAllComplainsView.as_view(), name='complains'),
+    path('complains/<uuid:complain_id>/', SuperAdminGetComplainView.as_view(), name='complain_detail'),
+    
 ]
