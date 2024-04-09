@@ -462,19 +462,16 @@ class OrganisationComplainListCreateView(generics.ListCreateAPIView):
         
         admin_instance = admin_instance.first()
         
-        serializer = OrganisationComplainSerializer(data=request.data)
-
-        if serializer.is_valid():
-            # create the complain
-            complain = OrganisationComplain.objects.create(
-                organisation=organisation_instance,
-                topic=request.data['topic'],
-                message=request.data['message'],
-                admin=admin_instance
-            )
-            return Response({"message":"complain created successfull", "id":str(complain.id)}, status=status.HTTP_201_CREATED)
+        # serializer = OrganisationComplainSerializer(data=request.data)
+        # create the complain
+        complain = OrganisationComplain.objects.create(
+            organisation=organisation_instance,
+            topic=request.data['topic'],
+            message=request.data['message'],
+            admin=admin_instance
+        )
+        return Response({"message":"complain created successfull", "id":str(complain.id)}, status=status.HTTP_201_CREATED)
         
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
 class OrganisationComplainDetailView(generics.RetrieveUpdateDestroyAPIView):
