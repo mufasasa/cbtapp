@@ -432,6 +432,7 @@ class OrganisationComplainListCreateView(generics.ListCreateAPIView):
     serializer_class = OrganisationComplainSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = [TimedAuthTokenAuthentication]
+    paginator = PageNumberPagination()
 
     # list all complains
     def get(self, request, organisation_id):
@@ -440,6 +441,11 @@ class OrganisationComplainListCreateView(generics.ListCreateAPIView):
             return Response(status=status.HTTP_403_FORBIDDEN)
         
         complains = organisation_instance.complains.all()
+        page = self.paginator.paginate_queryset(complains, request)
+        if page is not None:
+            serializer = OrganisationComplainSerializer(page, many=True)
+            return self.paginator.get_paginated_response(serializer.data)
+        
         serializer = OrganisationComplainSerializer(complains, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
@@ -450,10 +456,22 @@ class OrganisationComplainListCreateView(generics.ListCreateAPIView):
         if not user_is_staff_of_organization(request.user, organisation_instance):
             return Response(status=status.HTTP_403_FORBIDDEN)
         
+        admin_instance = OrganisationAdmin.objects.filter(user=request.user, organisation=organisation_instance)
+        if not admin_instance.exists():
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
+        admin_instance = admin_instance.first()
+        
         serializer = OrganisationComplainSerializer(data=request.data)
 
         if serializer.is_valid():
-            complain = serializer.save(organisation=organisation_instance)
+            # create the complain
+            complain = OrganisationComplain.objects.create(
+                organisation=organisation_instance,
+                topic=request.data['topic'],
+                message=request.data['message'],
+                admin=admin_instance
+            )
             return Response({"message":"complain created successfull", "id":str(complain.id)}, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

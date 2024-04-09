@@ -29,13 +29,17 @@ class OrganisationAdminListCreateView(generics.ListCreateAPIView):
     # create a new organisation admin
     def post(self, request):
         serializer = OrganisationAdminSerializer(data=request.data)
-
+        # if no user exists with email
         # create a new user
-        user = get_user_model().objects.create_user(
-            username=request.data['email'],
-            password=request.data['password'],
-            email=request.data['email']
-        )
+        User = get_user_model()
+        if User.objects.filter(username=request.data['email']).exists():
+            user = User.objects.get(username=request.data['email'])
+        else:
+            user = get_user_model().objects.create_user(
+                username=request.data['email'],
+                password=request.data['password'],
+                email=request.data['email']
+            )
 
         # create a new organisation admin
         if serializer.is_valid():

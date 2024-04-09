@@ -5,7 +5,7 @@ from .views import *
 urlpatterns = [
 
     path('organisations/', OrganisationListCreateView.as_view(), name='organisations'),
-    path('organisations/<uuid:organisation_id>/', OrganisationDetailView.as_view(), name='organisation_detail'),
+    path('organisation_detail/<uuid:organisation_id>/', OrganisationDetailView.as_view(), name='organisation_detail'),
     path('candidates/', CandidateListCreateView.as_view(), name='candidates'),
     path('candidates/<uuid:pk>/', CandidateDetailView.as_view(), name='candidate_detail'),
     path('organisation/<uuid:organisation_id>/exams/', OrganisationListCreateExamsView.as_view(), name='organisation_exams'),
