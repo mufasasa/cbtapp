@@ -8,6 +8,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 # from authentication.models import TimedAuthToken
 from authentication.authentication import TimedAuthTokenAuthentication
+from organisations_app.serializers import OrganisationSerializer
 
 
 
@@ -221,3 +222,45 @@ class ReceptionStaffDetailView(generics.RetrieveUpdateDestroyAPIView):
         reception_staff.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
+
+
+
+class SuperAdminListAllOrganisationsView(generics.ListAPIView):
+    queryset = Organisation.objects.all()
+    serializer_class = OrganisationSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TimedAuthTokenAuthentication]
+
+    # list all organisations
+    def get(self, request):
+        organisations = Organisation.objects.all()
+        serializer = OrganisationSerializer(organisations, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+class SuperAdminActivateOrganisationView(generics.UpdateAPIView):
+    queryset = Organisation.objects.all()
+    serializer_class = OrganisationSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TimedAuthTokenAuthentication]
+
+    # activate an organisation
+    def put(self, request, organisation_id):
+        organisation = Organisation.objects.get(id=organisation_id)
+        organisation.active = True
+        organisation.save()
+        return Response(status=status.HTTP_200_OK)
+    
+
+class SuperAdminDeactivateOrganisationView(generics.UpdateAPIView):
+    queryset = Organisation.objects.all()
+    serializer_class = OrganisationSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TimedAuthTokenAuthentication]
+
+    # deactivate an organisation
+    def put(self, request, organisation_id):
+        organisation = Organisation.objects.get(id=organisation_id)
+        organisation.active = False
+        organisation.save()
+        return Response(status=status.HTTP_200_OK)

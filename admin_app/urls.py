@@ -10,4 +10,6 @@ urlpatterns = [
     path('super_admins/<uuid:pk>/', SuperAdminDetailView.as_view(), name='super_admin_detail'),
     path('reception_staff/', ReceptionStaffListCreateView.as_view(), name='reception_staff'),
     path('reception_staff/<uuid:pk>/', ReceptionStaffDetailView.as_view(), name='reception_staff_detail'),
+    path('organisation/<uuid:organisation_id>/activate/', SuperAdminActivateOrganisationView.as_view(), name='activate_organisation'),
+    path('organisation/<uuid:organisation_id>/deactivate/', SuperAdminDeactivateOrganisationView.as_view(), name='deactivate_organisation'),
 ]

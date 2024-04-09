@@ -87,3 +87,9 @@ class OrganisationCreateCandidateSerializer(serializers.Serializer):
     email = serializers.EmailField()
     phone_number_1 = serializers.CharField()
     phone_number_2 = serializers.CharField(required=False)
+
+
+class OrganisationComplainSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrganisationComplain
+        fields = '__all__'

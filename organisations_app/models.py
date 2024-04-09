@@ -15,6 +15,14 @@ EXAM_STATUS = (
     ('archived', 'Archived'),
 )
 
+COMPLAIN_STATUS = (
+    ('not_attended', 'Not Attended'),
+    ('waiting', 'Waiting'),
+    ('cleared', 'Cleared'),
+)
+
+
+
 
 
 
@@ -26,6 +34,7 @@ class Organisation(models.Model):
     email = models.EmailField(max_length=100)
     website = models.URLField(max_length=100, blank=True, null=True)
     logo = models.ImageField(upload_to='logos/', blank=True, null=True)
+    active = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -65,3 +74,15 @@ class Examination(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):
         return self.name
+    
+
+class OrganisationComplain(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE, related_name='complains')
+    topic = models.CharField(max_length=100)
+    message = models.TextField()
+    status =  models.CharField(max_length=100, choices=COMPLAIN_STATUS, default='not_attended')
+    created_at = models.DateTimeField(auto_now_add=True)
+    admin  = models.ForeignKey(OrganisationAdmin, on_delete=models.CASCADE, related_name='complains')
+    def __str__(self):
+        return self.message

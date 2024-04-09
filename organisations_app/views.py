@@ -424,3 +424,111 @@ class OrganisationGetExamCandidatesView(generics.ListAPIView):
         
         serializer = CandidateSerializer(candidates, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+
+class OrganisationComplainListCreateView(generics.ListCreateAPIView):
+    queryset = OrganisationComplain.objects.all()
+    serializer_class = OrganisationComplainSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TimedAuthTokenAuthentication]
+
+    # list all complains
+    def get(self, request, organisation_id):
+        organisation_instance = Organisation.objects.get(pk=organisation_id)
+        if not user_is_staff_of_organization(request.user, organisation_instance):
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
+        complains = organisation_instance.complains.all()
+        serializer = OrganisationComplainSerializer(complains, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+    # create a new complain
+    def post(self, request, organisation_id):
+        organisation_instance = Organisation.objects.get(pk=organisation_id)
+        if not user_is_staff_of_organization(request.user, organisation_instance):
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
+        serializer = OrganisationComplainSerializer(data=request.data)
+
+        if serializer.is_valid():
+            complain = serializer.save(organisation=organisation_instance)
+            return Response({"message":"complain created successfull", "id":str(complain.id)}, status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class OrganisationComplainDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = OrganisationComplain.objects.all()
+    serializer_class = OrganisationComplainSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TimedAuthTokenAuthentication]
+
+    # retrieve a complain
+    def get(self, request, organisation_id, complain_id):
+        organisation_instance = Organisation.objects.get(pk=organisation_id)
+        if not user_is_staff_of_organization(request.user, organisation_instance):
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
+        complain = OrganisationComplain.objects.get(pk=complain_id)
+        serializer = OrganisationComplainSerializer(complain)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+    # update a complain
+    def put(self, request, organisation_id, complain_id):
+        organisation_instance = Organisation.objects.get(pk=organisation_id)
+        if not user_is_staff_of_organization(request.user, organisation_instance):
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
+        complain = OrganisationComplain.objects.get(pk=complain_id)
+
+        complain.topic = request.data['topic'] if 'topic' in request.data else complain.topic
+        complain.message = request.data['message'] if 'message' in request.data else complain.message
+        complain.save()
+
+        
+        return Response({"message":"complain update successfull", "id":str(complain.id)},status=status.HTTP_200_OK)
+    
+
+    # delete a complain
+    def delete(self, request, organisation_id, complain_id):
+        organisation_instance = Organisation.objects.get(pk=organisation_id)
+        if not user_is_staff_of_organization(request.user, organisation_instance):
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
+        complain = OrganisationComplain.objects.get(pk=complain_id)
+        complain.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+
+
+
+class OrganisationDetailView(generics.RetrieveUpdateAPIView):
+    "fetch and update organisation details"
+    queryset = Organisation.objects.all()
+    serializer_class = OrganisationSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TimedAuthTokenAuthentication]
+
+    def get(self, request, organisation_id):
+        organisation = Organisation.objects.get(pk=organisation_id)
+        serializer = OrganisationSerializer(organisation)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+    def put(self, request, organisation_id):
+        organisation_instance = Organisation.objects.get(pk=organisation_id)
+        if not user_is_staff_of_organization(request.user, organisation_instance):
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
+        organisation_instance.name = request.data['name'] if 'name' in request.data else organisation_instance.name
+        organisation_instance.address = request.data['address'] if 'address' in request.data else organisation_instance.address
+        organisation_instance.phone = request.data['phone'] if 'phone' in request.data else organisation_instance.phone
+        organisation_instance.email = request.data['email'] if 'email' in request.data else organisation_instance.email
+        organisation_instance.website = request.data['website'] if 'website' in request.data else organisation_instance.website
+        organisation_instance.logo = request.data['logo'] if 'logo' in request.data else organisation_instance.logo
+
+        organisation_instance.save()
+        return Response({"message":"organisation update successfull", "id":str(organisation_instance.id)},status=status.HTTP_200_OK)
