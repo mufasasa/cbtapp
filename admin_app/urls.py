@@ -14,5 +14,6 @@ urlpatterns = [
     path('organisation/<uuid:organisation_id>/deactivate/', SuperAdminDeactivateOrganisationView.as_view(), name='deactivate_organisation'),
     path('complains/', SuperAdminGetAllComplainsView.as_view(), name='complains'),
     path('complains/<uuid:complain_id>/', SuperAdminGetComplainView.as_view(), name='complain_detail'),
+    path('all_organisations/', SuperAdminListAllOrganisationsView.as_view(), name='all_organisations'),
     
 ]

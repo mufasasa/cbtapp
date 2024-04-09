@@ -9,7 +9,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 # from authentication.models import TimedAuthToken
 from authentication.authentication import TimedAuthTokenAuthentication
 from organisations_app.serializers import *
-
+from rest_framework.pagination import PageNumberPagination
 
 
 
@@ -230,10 +230,16 @@ class SuperAdminListAllOrganisationsView(generics.ListAPIView):
     serializer_class = OrganisationSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = [TimedAuthTokenAuthentication]
+    paginator = PageNumberPagination()
 
     # list all organisations
     def get(self, request):
         organisations = Organisation.objects.all()
+        page = self.paginate_queryset(organisations)
+        if page is not None:
+            serializer = OrganisationSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
         serializer = OrganisationSerializer(organisations, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
@@ -272,10 +278,15 @@ class SuperAdminGetAllComplainsView(generics.ListAPIView):
     serializer_class = OrganisationComplainSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = [TimedAuthTokenAuthentication]
+    paginator = PageNumberPagination()
 
     # list all complains
     def get(self, request):
         complains = OrganisationComplain.objects.all()
+        page = self.paginate_queryset(complains)
+        if page is not None:
+            serializer = OrganisationComplainSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
         serializer = OrganisationComplainSerializer(complains, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
