@@ -143,7 +143,11 @@ class OrganisationListCreateExamsView(generics.ListCreateAPIView):
     paginator = PageNumberPagination()
 
     # list all exams of an organisation
-    def get(self, request, organisation_id):
+    def get(self, request):
+        organisation_id = request.query_params.get('organisation_id', None)
+        if not organisation_id:
+            return Response({'error': 'organisation_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+
         if not user_is_staff_of_organization(request.user, Organisation.objects.get(pk=organisation_id)):
             return Response(status=status.HTTP_403_FORBIDDEN)
         
@@ -188,22 +192,23 @@ class OrganisationExaminationDetailView(generics.RetrieveUpdateDestroyAPIView):
     authentication_classes = [TimedAuthTokenAuthentication]
 
     # retrieve an examination
-    def get(self, request, organisation_id, exam_id):
-        if not user_is_staff_of_organization(request.user, Organisation.objects.get(pk=organisation_id)):
+    def get(self, request, exam_id):
+        exam = Examination.objects.get(pk=exam_id)
+        organisation = exam.organisation
+        if not user_is_staff_of_organization(request.user, organisation):
             return Response(status=status.HTTP_403_FORBIDDEN)
         
-        exam = Examination.objects.get(pk=exam_id)
         serializer = ExaminationSerializer(exam)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
 
     # update an examination
-    def put(self, request, organisation_id, exam_id):
-        if not user_is_staff_of_organization(request.user, Organisation.objects.get(pk=organisation_id)):
+    def put(self, request, exam_id):
+        exam = Examination.objects.get(pk=exam_id)
+        organisation = exam.organisation
+        if not user_is_staff_of_organization(request.user, organisation):
             return Response(status=status.HTTP_403_FORBIDDEN)
         
-        exam = Examination.objects.get(pk=exam_id)
-
         # update an examination
         exam.name = request.data['name'] if 'name' in request.data else exam.name
         exam.description = request.data['description'] if 'description' in request.data else exam.description
@@ -221,11 +226,12 @@ class OrganisationExaminationDetailView(generics.RetrieveUpdateDestroyAPIView):
     
 
     # delete an examination
-    def delete(self, request, organisation_id, exam_id):
-        if not user_is_staff_of_organization(request.user, Organisation.objects.get(pk=organisation_id)):
+    def delete(self, request, exam_id):
+        exam = Examination.objects.get(pk=exam_id)
+        organisation = exam.organisation
+        if not user_is_staff_of_organization(request.user, organisation):
             return Response(status=status.HTTP_403_FORBIDDEN)
         
-        exam = Examination.objects.get(pk=exam_id)
         exam.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
@@ -237,11 +243,12 @@ class OrganisationArchiveExaminationView(generics.UpdateAPIView):
     authentication_classes = [TimedAuthTokenAuthentication]
 
     # archive an examination
-    def put(self, request, organisation_id, exam_id):
-        if not user_is_staff_of_organization(request.user, Organisation.objects.get(pk=organisation_id)):
+    def put(self, request, exam_id):
+        exam =  Examination.objects.get(pk=exam_id)
+        organisation_instance = exam.organisation
+        if not user_is_staff_of_organization(request.user, organisation_instance):
             return Response(status=status.HTTP_403_FORBIDDEN)
         
-        exam = Examination.objects.get(pk=exam_id)
         exam.status = 'archived'
         exam.save()
         return Response(status=status.HTTP_200_OK)
@@ -283,7 +290,11 @@ class OrganisationListCreateCandidatesView(generics.ListCreateAPIView):
     paginator = PageNumberPagination()
 
     # create a new candidate
-    def post(self, request, organisation_id):
+    def post(self, request):
+        organisation_id = request.query_params.get('organisation_id')
+        if not organisation_id:
+            return Response({'error': 'organisation_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
         organisation_instance = Organisation.objects.get(pk=organisation_id)
         if not user_is_staff_of_organization(request.user, organisation_instance):
             return Response(status=status.HTTP_403_FORBIDDEN)
@@ -326,7 +337,11 @@ class OrganisationListCreateCandidatesView(generics.ListCreateAPIView):
     
 
 
-    def get(self, request, organisation_id):
+    def get(self, request):
+        organisation_id = request.query_params.get('organisation_id')
+        if not organisation_id:
+            return Response({'error': 'organisation_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
         organisation_instance = Organisation.objects.get(pk=organisation_id)
         if not user_is_staff_of_organization(request.user, organisation_instance):
             return Response(status=status.HTTP_403_FORBIDDEN)
@@ -353,8 +368,9 @@ class OrganisationCandidateDetailView(generics.RetrieveUpdateDestroyAPIView):
     authentication_classes = [TimedAuthTokenAuthentication]
 
     # retrieve a candidate
-    def get(self, request, organisation_id, candidate_id):
-        organisation_instance = Organisation.objects.get(pk=organisation_id)
+    def get(self, request, candidate_id):
+        candidate = Candidate.objects.get(pk=candidate_id)
+        organisation_instance = candidate.organisation
         if not user_is_staff_of_organization(request.user, organisation_instance):
             return Response(status=status.HTTP_403_FORBIDDEN)
         
@@ -364,12 +380,12 @@ class OrganisationCandidateDetailView(generics.RetrieveUpdateDestroyAPIView):
     
 
     # update a candidate
-    def put(self, request, organisation_id, candidate_id):
-        organisation_instance = Organisation.objects.get(pk=organisation_id)
+    def put(self, request, candidate_id):
+        candidate = Candidate.objects.get(pk=candidate_id)
+        organisation_instance = candidate.organisation
         if not user_is_staff_of_organization(request.user, organisation_instance):
             return Response(status=status.HTTP_403_FORBIDDEN)
         
-        candidate = Candidate.objects.get(pk=candidate_id)
 
         candidate.first_name = request.data['first_name'] if 'first_name' in request.data else candidate.first_name
         candidate.last_name = request.data['last_name'] if 'last_name' in request.data else candidate.last_name
@@ -386,12 +402,13 @@ class OrganisationCandidateDetailView(generics.RetrieveUpdateDestroyAPIView):
     
 
     # delete a candidate
-    def delete(self, request, organisation_id, candidate_id):
-        organisation_instance = Organisation.objects.get(pk=organisation_id)
+    def delete(self, request, candidate_id):
+        candidate = Candidate.objects.get(pk=candidate_id)
+        organisation_instance = candidate.organisation
+
         if not user_is_staff_of_organization(request.user, organisation_instance):
             return Response(status=status.HTTP_403_FORBIDDEN)
         
-        candidate = Candidate.objects.get(pk=candidate_id)
         candidate.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -405,12 +422,12 @@ class OrganisationGetExamCandidatesView(generics.ListAPIView):
     paginator = PageNumberPagination()
 
 
-    def get(self, request, organisation_id, exam_id):
-        organisation_instance = Organisation.objects.get(pk=organisation_id)
+    def get(self, request, exam_id):
+        exam = Examination.objects.get(pk=exam_id)
+        organisation_instance = exam.organisation
         if not user_is_staff_of_organization(request.user, organisation_instance):
             return Response(status=status.HTTP_403_FORBIDDEN)
         
-        exam = Examination.objects.get(pk=exam_id)
         candidates = exam.candidates.all()
 
         if request.query_params.get('name'):
@@ -435,7 +452,11 @@ class OrganisationComplainListCreateView(generics.ListCreateAPIView):
     paginator = PageNumberPagination()
 
     # list all complains
-    def get(self, request, organisation_id):
+    def get(self, request):
+        organisation_id = request.query_params.get('organisation_id')
+        if not organisation_id:
+            return Response({'error': 'organisation_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
         organisation_instance = Organisation.objects.get(pk=organisation_id)
         if not user_is_staff_of_organization(request.user, organisation_instance):
             return Response(status=status.HTTP_403_FORBIDDEN)
@@ -451,7 +472,11 @@ class OrganisationComplainListCreateView(generics.ListCreateAPIView):
     
 
     # create a new complain
-    def post(self, request, organisation_id):
+    def post(self, request):
+        organisation_id = request.query_params.get('organisation_id')
+        if not organisation_id:
+            return Response({'error': 'organisation_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
         organisation_instance = Organisation.objects.get(pk=organisation_id)
         if not user_is_staff_of_organization(request.user, organisation_instance):
             return Response(status=status.HTTP_403_FORBIDDEN)
@@ -481,23 +506,25 @@ class OrganisationComplainDetailView(generics.RetrieveUpdateDestroyAPIView):
     authentication_classes = [TimedAuthTokenAuthentication]
 
     # retrieve a complain
-    def get(self, request, organisation_id, complain_id):
-        organisation_instance = Organisation.objects.get(pk=organisation_id)
+    def get(self, request, complain_id):
+        complain = OrganisationComplain.objects.get(pk=complain_id)
+        organisation_instance = complain.organisation
+
         if not user_is_staff_of_organization(request.user, organisation_instance):
             return Response(status=status.HTTP_403_FORBIDDEN)
         
-        complain = OrganisationComplain.objects.get(pk=complain_id)
         serializer = OrganisationComplainSerializer(complain)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
 
     # update a complain
-    def put(self, request, organisation_id, complain_id):
-        organisation_instance = Organisation.objects.get(pk=organisation_id)
+    def put(self, request, complain_id):
+        complain = OrganisationComplain.objects.get(pk=complain_id)
+        organisation_instance = complain.organisation
+
         if not user_is_staff_of_organization(request.user, organisation_instance):
             return Response(status=status.HTTP_403_FORBIDDEN)
         
-        complain = OrganisationComplain.objects.get(pk=complain_id)
 
         complain.topic = request.data['topic'] if 'topic' in request.data else complain.topic
         complain.message = request.data['message'] if 'message' in request.data else complain.message
@@ -508,12 +535,13 @@ class OrganisationComplainDetailView(generics.RetrieveUpdateDestroyAPIView):
     
 
     # delete a complain
-    def delete(self, request, organisation_id, complain_id):
-        organisation_instance = Organisation.objects.get(pk=organisation_id)
+    def delete(self, request, complain_id):
+        complain = OrganisationComplain.objects.get(pk=complain_id)
+        organisation_instance = complain.organisation
+
         if not user_is_staff_of_organization(request.user, organisation_instance):
             return Response(status=status.HTTP_403_FORBIDDEN)
         
-        complain = OrganisationComplain.objects.get(pk=complain_id)
         complain.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
