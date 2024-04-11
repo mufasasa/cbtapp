@@ -15,7 +15,7 @@ urlpatterns = [
     path('organisation/candidates/',OrganisationListCreateCandidatesView.as_view(), name='organisation_candidates'),
     path('organisation/candidates/<uuid:candidate_id>/', OrganisationCandidateDetailView.as_view(), name='organisation_candidate_detail'),
 
-    path('organisatio/complains/', OrganisationComplainListCreateView.as_view(), name='organisation_complains'),
+    path('organisation/complains/', OrganisationComplainListCreateView.as_view(), name='organisation_complains'),
     path('organisation/complains/<uuid:complain_id>/', OrganisationComplainDetailView.as_view(), name='organisation_complain_detail'),
 
 ]
