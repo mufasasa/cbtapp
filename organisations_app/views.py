@@ -145,14 +145,16 @@ class OrganisationListCreateExamsView(generics.ListCreateAPIView):
     # list all exams of an organisation
     def get(self, request):
         organisation_id = request.query_params.get('organisation_id', None)
+    
+        organisation = None
         if not organisation_id:
-            return Response({'error': 'organisation_id is required'}, status=status.HTTP_400_BAD_REQUEST)
-
-        if not user_is_staff_of_organization(request.user, Organisation.objects.get(pk=organisation_id)):
-            return Response(status=status.HTTP_403_FORBIDDEN)
+            organisation = Organisation.objects.get(pk=organisation_id)
         
-        organisation = Organisation.objects.get(pk=organisation_id)
-        exams = organisation.examinations.all()
+        if organisation:
+            exams = organisation.examinations.all()
+        else:
+            exams = Examination.objects.all()
+
 
         if request.query_params.get('status'):
             exams = exams.filter(status=request.query_params.get('status'))
@@ -170,7 +172,9 @@ class OrganisationListCreateExamsView(generics.ListCreateAPIView):
     
 
     # create a new exam for an organisation
-    def create(self, request, organisation_id):
+    def create(self, request):
+        organisation_id = request.data['organisation']
+
         if not user_is_staff_of_organization(request.user, Organisation.objects.get(pk=organisation_id)):
             return Response(status=status.HTTP_403_FORBIDDEN)
         
@@ -454,14 +458,13 @@ class OrganisationComplainListCreateView(generics.ListCreateAPIView):
     # list all complains
     def get(self, request):
         organisation_id = request.query_params.get('organisation_id')
-        if not organisation_id:
-            return Response({'error': 'organisation_id is required'}, status=status.HTTP_400_BAD_REQUEST)
         
-        organisation_instance = Organisation.objects.get(pk=organisation_id)
-        if not user_is_staff_of_organization(request.user, organisation_instance):
-            return Response(status=status.HTTP_403_FORBIDDEN)
-        
-        complains = organisation_instance.complains.all()
+        if organisation_id:
+            organisation_instance = Organisation.objects.get(pk=organisation_id)
+            complains = organisation_instance.complains.all()
+        else:
+            complains = OrganisationComplain.objects.all()
+            
         page = self.paginator.paginate_queryset(complains, request)
         if page is not None:
             serializer = OrganisationComplainSerializer(page, many=True)
