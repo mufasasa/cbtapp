@@ -455,7 +455,7 @@ class OrganisationComplainListCreateView(generics.ListCreateAPIView):
 
     # list all complains
     def get(self, request):
-        organisation_id = request.query_params.get('organisation_id')
+        organisation_id = request.query_params.get('organisation')
         
         if organisation_id:
             organisation_instance = Organisation.objects.get(pk=organisation_id)
