@@ -147,7 +147,7 @@ class OrganisationListCreateExamsView(generics.ListCreateAPIView):
         organisation_id = request.query_params.get('organisation_id', None)
     
         organisation = None
-        if not organisation_id:
+        if  organisation_id:
             organisation = Organisation.objects.get(pk=organisation_id)
         
         if organisation:
@@ -343,14 +343,12 @@ class OrganisationListCreateCandidatesView(generics.ListCreateAPIView):
 
     def get(self, request):
         organisation_id = request.query_params.get('organisation_id')
-        if not organisation_id:
-            return Response({'error': 'organisation_id is required'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        organisation_instance = Organisation.objects.get(pk=organisation_id)
-        if not user_is_staff_of_organization(request.user, organisation_instance):
-            return Response(status=status.HTTP_403_FORBIDDEN)
-        
-        candidates = organisation_instance.candidates.all()
+        if  organisation_id:
+            organisation_instance = Organisation.objects.get(pk=organisation_id)
+            candidates = organisation_instance.candidates.all()
+        else:
+            candidates = Candidate.objects.all()
+            
         if request.query_params.get('name'):
             # search for either first name or last name containig name
             candidates = candidates.filter(first_name__icontains=request.query_params.get('name')) | candidates.filter(last_name__icontains=request.query_params.get('name'))
@@ -464,7 +462,7 @@ class OrganisationComplainListCreateView(generics.ListCreateAPIView):
             complains = organisation_instance.complains.all()
         else:
             complains = OrganisationComplain.objects.all()
-            
+
         page = self.paginator.paginate_queryset(complains, request)
         if page is not None:
             serializer = OrganisationComplainSerializer(page, many=True)
