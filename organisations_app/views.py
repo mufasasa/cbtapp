@@ -342,8 +342,9 @@ class OrganisationListCreateCandidatesView(generics.ListCreateAPIView):
             phone=request.data['phone'],
             phone2=request.data['phone2'] if 'phone2' in request.data else None,
             photo=request.data['photo'] if 'photo' in request.data else None,
-            organsation = organisation_instance
         )
+        canditate_instance.organisation = organisation_instance
+        canditate_instance.save()
         
 
         
@@ -603,5 +604,4 @@ class RetreiveExamCandidatesView(generics.RetrieveAPIView):
         candidates = CandidateExam.objects.filter(examination=exam)
         serializer = CandidateExamSerializer(candidates, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
     
