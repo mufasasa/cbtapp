@@ -86,3 +86,10 @@ class OrganisationComplain(models.Model):
     admin  = models.ForeignKey(OrganisationAdmin, on_delete=models.CASCADE, related_name='complains')
     def __str__(self):
         return self.message
+    
+
+class CandidateExam(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    candidate = models.ForeignKey('candidates_app.Candidate', on_delete=models.CASCADE, related_name='candidate_exams')
+    examination = models.ForeignKey(Examination, on_delete=models.CASCADE, related_name='candidate_exams')
+    exam_number = models.CharField(max_length=100, blank=True, null=True, unique=True)

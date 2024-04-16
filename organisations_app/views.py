@@ -184,6 +184,17 @@ class OrganisationListCreateExamsView(generics.ListCreateAPIView):
         if serializer.is_valid():
             exam = serializer.save()
             exam_id = exam.id
+
+            #  create candidate exam instances for each candidate
+            candidates_ids = request.data.get('candidates', [])
+            for candidate_id in candidates_ids:
+                candidate = Candidate.objects.get(pk=candidate_id)
+                CandidateExam.objects.create(
+                    candidate=candidate,
+                    examination=exam,
+                    exam_number = generate_exam_number()
+                )
+
             return Response({"message":"successfull", "id":exam_id}, status=status.HTTP_201_CREATED)
         
         
@@ -578,3 +589,5 @@ class OrganisationDetailView(generics.RetrieveUpdateAPIView):
 
         organisation_instance.save()
         return Response({"message":"organisation update successfull", "id":str(organisation_instance.id)},status=status.HTTP_200_OK)
+    
+
