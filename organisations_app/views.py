@@ -295,7 +295,7 @@ class OrganisationListCreateCandidatesView(generics.ListCreateAPIView):
 
     # create a new candidate
     def post(self, request):
-        organisation_id = request.query_params.get('organisation')
+        organisation_id = request.data.get('organisation')
         if not organisation_id:
             return Response({'error': 'organisation_id is required'}, status=status.HTTP_400_BAD_REQUEST)
         
