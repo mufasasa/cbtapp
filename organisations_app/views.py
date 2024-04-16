@@ -592,14 +592,22 @@ class OrganisationDetailView(generics.RetrieveUpdateAPIView):
 
 
 class RetreiveExamCandidatesView(generics.RetrieveAPIView):
+    
     """
     fetch the candidates of an exam by examination id
     """
+    paginator = PageNumberPagination()
 
     def  get(self, request, exam_id):
+
         exam = Examination.objects.get(id=exam_id)
         
         candidates = CandidateExam.objects.filter(examination=exam)
+        page = self.paginator.paginate_queryset(candidates, request)
+        if page is not None:
+            serializer = CandidateExamSerializer(page, many=True)
+            return self.paginator.get_paginated_response(serializer.data)
+        
         serializer = CandidateExamSerializer(candidates, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
