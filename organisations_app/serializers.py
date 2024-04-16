@@ -93,3 +93,32 @@ class OrganisationComplainSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrganisationComplain
         fields = '__all__'
+
+
+
+
+class CandidateExamSerializer(serializers.ModelSerializer):
+    first_name =  serializers.SerializerMethodField()
+    last_name =  serializers.SerializerMethodField()
+    nin =  serializers.SerializerMethodField()
+    email =  serializers.SerializerMethodField()
+    exam_number =  serializers.SerializerMethodField()
+
+    class Meta:
+        model = CandidateExam
+        fields = '__all__'
+
+    def get_first_name(self, obj):
+        return obj.candidate.first_name
+    
+    def get_last_name(self, obj):
+        return obj.candidate.last_name
+    
+    def get_nin(self, obj):
+        return obj.candidate.nin
+    
+    def get_email(self, obj):
+        return obj.candidate.email
+    
+    def get_exam_number(self, obj):
+        return obj.exam_number

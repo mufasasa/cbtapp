@@ -591,3 +591,17 @@ class OrganisationDetailView(generics.RetrieveUpdateAPIView):
         return Response({"message":"organisation update successfull", "id":str(organisation_instance.id)},status=status.HTTP_200_OK)
     
 
+
+class RetreiveExamCandidatesView(generics.RetrieveAPIView):
+    """
+    fetch the candidates of an exam by examination id
+    """
+
+    def  get(self, request, exam_id):
+        exam = Examination.objects.get(id=exam_id)
+        
+        candidates = CandidateExam.objects.filter(examination=exam)
+        serializer = CandidateExamSerializer(candidates, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    
