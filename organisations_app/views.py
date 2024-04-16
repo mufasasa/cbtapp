@@ -315,8 +315,6 @@ class OrganisationListCreateCandidatesView(generics.ListCreateAPIView):
         if not user_is_staff_of_organization(request.user, organisation_instance):
             return Response(status=status.HTTP_403_FORBIDDEN)
         
-        serializer = CandidateSerializer(data=request.data)
-
 
         # check if user with email already exists
         user = get_user_model().objects.filter(username=request.data['email'])
