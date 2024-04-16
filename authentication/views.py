@@ -28,10 +28,12 @@ class LoginView(generics.CreateAPIView):
             if not user.check_password(request.data['password']):
                 return Response({'error': 'Invalid password'}, status=status.HTTP_400_BAD_REQUEST)
             
-            # get organisation admins, super admins and reception staff attached to the user
+            # get organisation admins, super admins, candidates, and reception staff attached to the user
             organisation_admin = OrganisationAdmin.objects.filter(user=user)
             super_admin = SuperAdmin.objects.filter(user=user)
             reception_staff = ReceptionStaff.objects.filter(user=user)
+            candidates = Candidate.objects.filter(user=user)
+
 
             # list of entities the user is attached to with ids, names and organisation ids
             entities = {}
@@ -65,9 +67,20 @@ class LoginView(generics.CreateAPIView):
                     'entity': 'reception_staff'
                 })
 
+            # candidates
+            candidates_list = []
+            for candidate in candidates:
+                candidates_list.append({
+                    'id': str(candidate.id),
+                    'name': candidate.first_name + ' ' + candidate.last_name,
+                    'entity': 'candidate'
+                })
+
+
             entities['organisation_admins'] = organisation_admins
             entities['super_admins'] = super_admins
             entities['reception_staffs'] = reception_staffs
+            entities['candidates'] = candidates_list
 
 
             

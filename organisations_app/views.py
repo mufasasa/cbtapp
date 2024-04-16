@@ -10,6 +10,7 @@ from authentication.utils  import user_is_in_entity, get_user_entity_instance, u
 from rest_framework.pagination import PageNumberPagination
 from utills_app.serializers import FileUploadSerializer
 from utills_app.models import FileUpload
+from .utils import *
 
 
 
@@ -330,8 +331,9 @@ class OrganisationListCreateCandidatesView(generics.ListCreateAPIView):
             phone=request.data['phone'],
             phone2=request.data['phone2'] if 'phone2' in request.data else None,
             photo=request.data['photo'] if 'photo' in request.data else None,
+            organsation = organisation_instance
         )
-        canditate_instance.organisation.set([organisation_instance])
+        
 
         
         return Response({
@@ -474,7 +476,7 @@ class OrganisationComplainListCreateView(generics.ListCreateAPIView):
 
     # create a new complain
     def post(self, request):
-        organisation_id = request.query_params.get('organisation')
+        organisation_id = request.data.get('organisation_id')
         if not organisation_id:
             return Response({'error': 'organisation_id is required'}, status=status.HTTP_400_BAD_REQUEST)
         
