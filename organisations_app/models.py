@@ -93,3 +93,4 @@ class CandidateExam(models.Model):
     candidate = models.ForeignKey('candidates_app.Candidate', on_delete=models.CASCADE, related_name='candidate_exams')
     examination = models.ForeignKey(Examination, on_delete=models.CASCADE, related_name='candidate_exams')
     exam_number = models.CharField(max_length=100, blank=True, null=True, unique=True)
+    candidate_answers = models.JSONField(default=list, blank=True, null=True)

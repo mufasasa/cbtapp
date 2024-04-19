@@ -22,6 +22,26 @@ class FetchCandidateExamView(generics.RetrieveAPIView):
         if candidate_exam.candidate.user != request.user:
             return Response(status=status.HTTP_403_FORBIDDEN)
         
-        exam = candidate_exam.examination   
+        exam = candidate_exam.examination
+        # modify the cndidate exam questions to remove the answer property
+        exam.questions = [{**question, 'answer': None} for question in exam.questions] 
         serializer = ExaminationDetailSerializer(exam)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+
+class SubmitCandidateExam(generics.UpdateAPIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TimedAuthTokenAuthentication]
+
+    def put(self, request, exam_number):
+        candidate_exam = CandidateExam.objects.get(exam_number=exam_number)
+        if candidate_exam.candidate.user != request.user:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
+        exam = candidate_exam.examination
+        
+        data = request.data
+        candidate_exam.candidate_answers = data
+        candidate_exam.save()
+        return Response(status=status.HTTP_200_OK)
