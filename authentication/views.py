@@ -108,3 +108,26 @@ class ResetPasswordView(generics.CreateAPIView):
             return Response(status=status.HTTP_200_OK)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class CandidateLogin(generics.CreateAPIView):
+    """
+    Candidates login endpoint
+    receives the  email, and exam number of a candidate,then logs  them in
+    """
+    serializer_class = CandidateLoginSerializer
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = CandidateLoginSerializer(data=request.data)
+
+        if serializer.is_valid():
+            candidate_exam = CandidateExam.objects.get(exam_number=request.data['exam_number'])
+            if candidate_exam.candidate.email != request.data['email']:
+                return Response({'error': 'Invalid email'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            token = TimedAuthToken.objects.create(user=candidate_exam.candidate.user)
+            return Response({'token': token.key,  "exam_id":str(candidate_exam.examination.id)}, status=status.HTTP_200_OK)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

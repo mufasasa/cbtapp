@@ -9,3 +9,7 @@ class LoginSerializer(serializers.Serializer):
     email = serializers.CharField()
     password = serializers.CharField()
 
+
+class CandidateLoginSerializer(serializers.Serializer):
+    email = serializers.CharField()
+    exam_number = serializers.CharField()
