@@ -11,5 +11,5 @@ class LoginSerializer(serializers.Serializer):
 
 
 class CandidateLoginSerializer(serializers.Serializer):
-    email = serializers.CharField()
+    password = serializers.CharField()
     exam_number = serializers.CharField()
