@@ -130,6 +130,23 @@ class CandidateLogin(generics.CreateAPIView):
                 return Response({'error': 'Invalid password'}, status=status.HTTP_400_BAD_REQUEST)
 
             token = TimedAuthToken.objects.create(user=candidate_exam.candidate.user)
-            return Response({'token': token.key,  "exam_id":str(candidate_exam.examination.id)}, status=status.HTTP_200_OK)
+            return Response({'token': token.key,
+                             'data':{
+                                 "candidate":{
+                                     "id": str(candidate_exam.candidate.id),
+                                     "name": candidate_exam.candidate.first_name + ' ' + candidate_exam.candidate.last_name,
+                                     "email": candidate_exam.candidate.email,
+                                 },
+                                 "exam":{
+                                        "id": str(candidate_exam.examination.id),
+                                        "name": candidate_exam.examination.name,
+                                        "description": candidate_exam.examination.description,
+                                        "start_time": candidate_exam.examination.start_time,
+                                        "end_time": candidate_exam.examination.end_time,
+                                        "duration": candidate_exam.examination.duration,
+                                        "instructions": candidate_exam.examination.instructions,
+                                 }
+                             }
+                             }, status=status.HTTP_200_OK)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
