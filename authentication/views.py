@@ -145,6 +145,10 @@ class CandidateLogin(generics.CreateAPIView):
                                         "end_time": candidate_exam.examination.end_time,
                                         "duration": candidate_exam.examination.duration,
                                         "instructions": candidate_exam.examination.instructions,
+                                        "total_marks": candidate_exam.examination.total_marks,
+                                        "passing_marks": candidate_exam.examination.passing_marks,
+                                        "questions": candidate_exam.examination.questions,
+                                        "status": candidate_exam.examination.status,
                                  }
                              }
                              }, status=status.HTTP_200_OK)
