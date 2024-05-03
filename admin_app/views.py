@@ -315,3 +315,67 @@ class SuperAdminGetComplainView(generics.RetrieveUpdateAPIView):
         complain.status = request.data['status']
         complain.save()
         return Response(status=status.HTTP_200_OK)
+    
+
+
+class VisitorListCreateView(generics.ListCreateAPIView):
+    queryset = Visitor.objects.all()
+    serializer_class = VisitorSerializer
+    permission_classes = [AllowAny]
+    paginator = PageNumberPagination()
+
+
+    # list all visitors
+    def get(self, request):
+        visitors = Visitor.objects.all()
+        if request.query_params.get('date'):
+            visitors = Visitor.objects.filter(created_at=request.query_params.get('date'))
+
+        page = self.paginate_queryset(visitors)
+        if page is not None:
+            serializer = VisitorSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = VisitorSerializer(visitors, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+    # create a new visitor
+    def post(self, request):
+        serializer = VisitorSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class VisitorDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Visitor.objects.all()
+    serializer_class = VisitorSerializer
+    permission_classes = [AllowAny]
+
+    # retrieve a visitor
+    def get(self, request, visitor_id):
+        visitor = Visitor.objects.get(id=visitor_id)
+        serializer = VisitorSerializer(visitor)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+    # update a visitor
+    def put(self, request, visitor_id):
+        visitor = Visitor.objects.get(id=visitor_id)
+        serializer = VisitorSerializer(visitor, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+    # delete a visitor
+    def delete(self, request, visitor_id):
+        visitor = Visitor.objects.get(id=visitor_id)
+        visitor.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

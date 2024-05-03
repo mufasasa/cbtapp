@@ -21,3 +21,9 @@ class ReceptionStaffSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReceptionStaff
         fields = '__all__'
+
+
+class VisitorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Visitor
+        fields = '__all__'
