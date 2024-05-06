@@ -404,3 +404,28 @@ class AdminReplyOrganisationComplainView(generics.UpdateAPIView):
         return Response(status=status.HTTP_200_OK)
     
 
+
+class AdminGetAllExamsView(generics.RetrieveAPIView):
+    queryset = Examination.objects.all()
+    serializer_class = ExaminationSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TimedAuthTokenAuthentication]
+    paginator = PageNumberPagination()
+
+    # retrieve all exams
+    def get(self, request):
+        exams = Examination.objects.all()
+
+        # filters: organisation, date
+        if request.query_params.get('organisation'):
+            exams = exams.filter(organisation=request.query_params.get('organisation'))
+        if request.query_params.get('date'):
+            exams = exams.filter(start_time=request.query_params.get('date'))
+
+
+        page = self.paginate_queryset(exams)
+        if page is not None:
+            serializer = ExaminationSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = ExaminationSerializer(exams, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

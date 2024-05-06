@@ -20,6 +20,7 @@ urlpatterns = [
 
 
     path('all_organisations/', SuperAdminListAllOrganisationsView.as_view(), name='all_organisations'),
+    path('all_exams/', AdminGetAllExamsView.as_view(), name='admin_all_exams'),
 
     # visitors
     path('visitors/', VisitorListCreateView.as_view(), name='visitors'),
