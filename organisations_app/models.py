@@ -81,6 +81,7 @@ class OrganisationComplain(models.Model):
     organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE, related_name='complains')
     topic = models.CharField(max_length=100)
     message = models.TextField()
+    messages = models.JSONField(default=list, blank=True, null=True)
     status =  models.CharField(max_length=100, choices=COMPLAIN_STATUS, default='not_attended')
     created_at = models.DateTimeField(auto_now_add=True)
     admin  = models.ForeignKey(OrganisationAdmin, on_delete=models.CASCADE, related_name='complains')

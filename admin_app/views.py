@@ -287,6 +287,12 @@ class SuperAdminGetAllComplainsView(generics.ListAPIView):
     # list all complains
     def get(self, request):
         complains = OrganisationComplain.objects.all()
+        # filters: organisation, status; not_attended, waiting, cleared
+        if request.query_params.get('organisation'):
+            complains = complains.filter(organisation=request.query_params.get('organisation'))
+        if request.query_params.get('status'):
+            complains = complains.filter(status=request.query_params.get('status'))
+
         page = self.paginate_queryset(complains)
         if page is not None:
             serializer = OrganisationComplainSerializer(page, many=True)
@@ -379,3 +385,22 @@ class VisitorDetailView(generics.RetrieveUpdateDestroyAPIView):
         visitor = Visitor.objects.get(id=visitor_id)
         visitor.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+
+
+class AdminReplyOrganisationComplainView(generics.UpdateAPIView):
+    queryset = OrganisationComplain.objects.all()
+    serializer_class = OrganisationComplainSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TimedAuthTokenAuthentication]
+
+    # reply to a complain
+    def put(self, request, complain_id):
+        complain = OrganisationComplain.objects.get(id=complain_id)
+        messages:list = complain.messages
+        messages.append(request.data['message'])
+        complain.messages = messages
+        complain.save()
+        return Response(status=status.HTTP_200_OK)
+    
+
