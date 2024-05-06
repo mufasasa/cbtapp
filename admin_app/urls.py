@@ -21,6 +21,12 @@ urlpatterns = [
 
     path('all_organisations/', SuperAdminListAllOrganisationsView.as_view(), name='all_organisations'),
     path('all_exams/', AdminGetAllExamsView.as_view(), name='admin_all_exams'),
+    path('all_exam_candidates/', AdminGetAllExamCandidates.as_view(), name='all_exam_candidates'),
+
+
+    # admid exam candidate
+    path('admit_exam_candidate/<uuid:candidate_exam_id>/', AdminMarkCandidateAdmittedView.as_view(), name='admit_exam_candidate'),
+
 
     # visitors
     path('visitors/', VisitorListCreateView.as_view(), name='visitors'),

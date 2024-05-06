@@ -429,3 +429,63 @@ class AdminGetAllExamsView(generics.RetrieveAPIView):
             return self.get_paginated_response(serializer.data)
         serializer = ExaminationSerializer(exams, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+
+class AdminGetAllExamCandidates(generics.RetrieveAPIView):
+    queryset = Examination.objects.all()
+    serializer_class = ExaminationSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TimedAuthTokenAuthentication]
+    paginator = PageNumberPagination()
+
+    # retrieve all exam candidates
+
+    def get(self, request, *args, **kwargs):
+        
+        all_candidates = CandidateExam.objects.all()
+
+        # filters: exam, organisation, date, status
+
+        if request.query_params.get('exam'):
+            all_candidates = all_candidates.filter(examination=request.query_params.get('exam'))
+
+        if request.query_params.get('organisation'):
+            all_candidates = all_candidates.filter(examination__organisation=request.query_params.get('organisation'))
+
+        if request.query_params.get('date'):
+            all_candidates = all_candidates.filter(examination__start_time=request.query_params.get('date'))
+
+        if request.query_params.get('status'):
+            all_candidates = all_candidates.filter(status=request.query_params.get('status'))
+
+        page = self.paginate_queryset(all_candidates)
+        if page is not None:
+            serializer = CandidateExamSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = CandidateExamSerializer(all_candidates, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+
+class AdminMarkCandidateAdmittedView(generics.UpdateAPIView):
+    """
+    This view marks the status on a candidate exam as admitted
+    """
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TimedAuthTokenAuthentication]
+
+    def update(self, request, candidate_exam_id):
+
+        # get the candidate_exam
+        candidate_exam_instance = CandidateExam.objects.get(id=candidate_exam_id)
+
+        candidate_exam_instance.status = 'admitted'
+        candidate_exam_instance.save()
+
+        return Response({'message':'successfully admitted'}, status=status.HTTP_200_OK)
+    
+    
+        
+

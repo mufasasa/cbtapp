@@ -22,6 +22,11 @@ COMPLAIN_STATUS = (
 )
 
 
+CANDIDATE_STATUS = (
+    ('admitted', 'Admitted'),
+    ('not_admitted', 'Not_admitted')
+)
+
 
 
 
@@ -95,3 +100,4 @@ class CandidateExam(models.Model):
     examination = models.ForeignKey(Examination, on_delete=models.CASCADE, related_name='candidate_exams')
     exam_number = models.CharField(max_length=100, blank=True, null=True, unique=True)
     candidate_answers = models.JSONField(default=list, blank=True, null=True)
+    status = models.CharField(max_length=100, choices=CANDIDATE_STATUS, default='not_admitted')
