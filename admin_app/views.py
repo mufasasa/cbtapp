@@ -1,3 +1,4 @@
+import datetime
 from django.shortcuts import render
 from .models import *
 from organisations_app.models import *
@@ -398,7 +399,16 @@ class AdminReplyOrganisationComplainView(generics.UpdateAPIView):
     def put(self, request, complain_id):
         complain = OrganisationComplain.objects.get(id=complain_id)
         messages:list = complain.messages
-        messages.append(request.data['message'])
+        # fetch the message  from the request
+        message = request.data['message']
+
+        # create a message object with the username of the sender  and date
+        messages.append({
+            'message': message,
+            'sender': request.user.first_name,
+            'date': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'user_id': str(request.user.id)
+        })
         complain.messages = messages
         complain.save()
         return Response(status=status.HTTP_200_OK)
@@ -486,6 +496,6 @@ class AdminMarkCandidateAdmittedView(generics.UpdateAPIView):
 
         return Response({'message':'successfully admitted'}, status=status.HTTP_200_OK)
     
-    
+
         
 
