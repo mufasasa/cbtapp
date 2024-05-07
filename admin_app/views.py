@@ -410,6 +410,22 @@ class AdminReplyOrganisationComplainView(generics.UpdateAPIView):
             'sender_username': request.user.username
         })
         complain.messages = messages
+        if complain.status == 'not_attended':
+            complain.status = 'waiting'
+        complain.save()
+        return Response(status=status.HTTP_200_OK)
+    
+
+class AdminMarkComplainClearedView(generics.UpdateAPIView):
+    queryset = OrganisationComplain.objects.all()
+    serializer_class = OrganisationComplainSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TimedAuthTokenAuthentication]
+
+    # mark a complain as cleared
+    def put(self, request, complain_id):
+        complain = OrganisationComplain.objects.get(id=complain_id)
+        complain.status = 'cleared'
         complain.save()
         return Response(status=status.HTTP_200_OK)
     
@@ -492,7 +508,7 @@ class AdminMarkCandidateAdmittedView(generics.UpdateAPIView):
         candidate_exam_instance = CandidateExam.objects.get(id=candidate_exam_id)
 
         candidate_exam_instance.status = 'admitted'
-        candidate_exam_instance.admitted_by =  f'{request.user.first_name} {request.user.last_name}'
+        candidate_exam_instance.admitted_by =  request.user.username
         candidate_exam_instance.time_admitted = datetime.datetime.now()
         candidate_exam_instance.save()
 
@@ -500,4 +516,3 @@ class AdminMarkCandidateAdmittedView(generics.UpdateAPIView):
     
 
         
-
