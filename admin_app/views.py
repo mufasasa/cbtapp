@@ -430,8 +430,8 @@ class AdminGetAllExamsView(generics.RetrieveAPIView):
         if request.query_params.get('organisation'):
             exams = exams.filter(organisation=request.query_params.get('organisation'))
         if request.query_params.get('date'):
-            exams = exams.filter(start_time=request.query_params.get('date'))
-
+            # filter for only  date though, in the start_time time not included
+            exams = exams.filter(start_time__date=request.query_params.get('date'))
 
         page = self.paginate_queryset(exams)
         if page is not None:

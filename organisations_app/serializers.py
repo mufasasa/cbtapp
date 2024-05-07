@@ -54,7 +54,8 @@ class CreateExamSerializer(serializers.Serializer):
             questions=validated_data.get('questions', []),
             total_marks=validated_data['total_marks'] if 'total_marks' in validated_data else None,
             passing_marks=validated_data['passing_marks'] if 'passing_marks' in validated_data else None,
-            organisation=organisation
+            organisation=organisation,
+            auto_grade = validated_data.get('auto_grade', False)
         )
         # add the candidates, which is a many to many field
         if 'candidates' in validated_data:
@@ -63,6 +64,26 @@ class CreateExamSerializer(serializers.Serializer):
                 exam.candidates.add(candidate)
         return exam
     
+
+    def validate(self, data):
+        """
+        Validate if the exam can be auto-graded based on the type of questions.
+        """
+        if data.get('auto_grade'):
+            all_objective = all(question.get('type') == 'objective' for question in data.get('questions', []))
+            if not all_objective:
+                raise serializers.ValidationError("All questions must be of type 'objective' for auto-grading.")
+            
+        # Check each question for a 'score' and assign default if missing also assign 'id' to each question
+        for question in data.get('questions', []):
+            if 'score' not in question:
+                question['score'] = 1  # Assign default score of 1 if not specified
+            
+            # Assign a new UUID as id if not provided
+            if 'id' not in question:
+                question['id'] = str(uuid.uuid4())
+
+        return data
 
 class OrganisationCreateSerializer(serializers.Serializer):
     name = serializers.CharField()

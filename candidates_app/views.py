@@ -2,6 +2,8 @@ from rest_framework.response import Response
 from rest_framework import generics
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
+
+from candidates_app.utils import auto_grade_exam
 from .models import *
 from django.contrib.auth import get_user_model
 from organisations_app.serializers import *
@@ -44,4 +46,11 @@ class SubmitCandidateExam(generics.UpdateAPIView):
         data = request.data
         candidate_exam.candidate_answers = data
         candidate_exam.save()
+
+        # auto grade the exam if auto grade is  set  to true
+        if exam.auto_grade:
+            
+            candidate_exam = auto_grade_exam(candidate_exam, exam)
+
+
         return Response(status=status.HTTP_200_OK)

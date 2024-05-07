@@ -75,6 +75,7 @@ class Examination(models.Model):
     candidates = models.ManyToManyField('candidates_app.Candidate', related_name='examinations', blank=True)
     organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE, related_name='examinations')
     status = models.CharField(max_length=100, choices=EXAM_STATUS, default='draft')
+    auto_grade = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):
@@ -101,3 +102,4 @@ class CandidateExam(models.Model):
     exam_number = models.CharField(max_length=100, blank=True, null=True, unique=True)
     candidate_answers = models.JSONField(default=list, blank=True, null=True)
     status = models.CharField(max_length=100, choices=CANDIDATE_STATUS, default='not_admitted')
+    score = models.IntegerField(blank=True, null=True)
