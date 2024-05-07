@@ -103,3 +103,5 @@ class CandidateExam(models.Model):
     candidate_answers = models.JSONField(default=list, blank=True, null=True)
     status = models.CharField(max_length=100, choices=CANDIDATE_STATUS, default='not_admitted')
     score = models.IntegerField(blank=True, null=True)
+    admitted_by = models.CharField(max_length=200, blank=True, null=True)
+    time_admitted = models.DateTimeField(blank=True, null=True)

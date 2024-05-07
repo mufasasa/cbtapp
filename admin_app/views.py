@@ -492,6 +492,8 @@ class AdminMarkCandidateAdmittedView(generics.UpdateAPIView):
         candidate_exam_instance = CandidateExam.objects.get(id=candidate_exam_id)
 
         candidate_exam_instance.status = 'admitted'
+        candidate_exam_instance.admitted_by =  f'{request.user.first_name} {request.user.last_name}'
+        candidate_exam_instance.time_admitted = datetime.datetime.now()
         candidate_exam_instance.save()
 
         return Response({'message':'successfully admitted'}, status=status.HTTP_200_OK)

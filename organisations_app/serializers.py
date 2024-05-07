@@ -124,6 +124,7 @@ class CandidateExamSerializer(serializers.ModelSerializer):
     nin =  serializers.SerializerMethodField()
     email =  serializers.SerializerMethodField()
     exam_number =  serializers.SerializerMethodField()
+    exam_name = serializers.SerializerMethodField()
 
     class Meta:
         model = CandidateExam
@@ -143,3 +144,6 @@ class CandidateExamSerializer(serializers.ModelSerializer):
     
     def get_exam_number(self, obj):
         return obj.exam_number
+    
+    def get_exam_name(self, obj):
+        return obj.examination.name
