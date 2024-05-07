@@ -178,23 +178,21 @@ class ReceptionStaffListCreateView(generics.ListCreateAPIView):
 
     # create a new reception staff
     def post(self, request):
-        serializer = ReceptionStaffSerializer(data=request.data)
-
-        # create a new user
+        #make a copy of the data and create a user to add  to the reception staff
+        mutable = request.data.copy()
         user = get_user_model().objects.create_user(
             username=request.data['email'],
             password=request.data['password'],
             email=request.data['email']
         )
+        mutable['user'] = user
+        serializer = ReceptionStaffSerializer(data=mutable)
 
-        # create a new reception staff
         if serializer.is_valid():
-            serializer.save(user=user)
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-
 
 class ReceptionStaffDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = ReceptionStaff.objects.all()
