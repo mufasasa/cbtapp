@@ -405,9 +405,9 @@ class AdminReplyOrganisationComplainView(generics.UpdateAPIView):
         # create a message object with the username of the sender  and date
         messages.append({
             'message': message,
-            'sender': request.user.first_name,
             'date': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-            'user_id': str(request.user.id)
+            'user_id': str(request.user.id),
+            'sender_username': request.user.username
         })
         complain.messages = messages
         complain.save()
