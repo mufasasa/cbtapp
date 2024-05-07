@@ -185,7 +185,7 @@ class ReceptionStaffListCreateView(generics.ListCreateAPIView):
             password=request.data['password'],
             email=request.data['email']
         )
-        mutable['user'] = user
+        mutable['user'] = user.id
         serializer = ReceptionStaffSerializer(data=mutable)
 
         if serializer.is_valid():
