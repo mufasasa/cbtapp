@@ -18,5 +18,6 @@ urlpatterns = [
     path('organisation/complains/', OrganisationComplainListCreateView.as_view(), name='organisation_complains'),
     path('organisation/complains/<uuid:complain_id>/', OrganisationComplainDetailView.as_view(), name='organisation_complain_detail'),
     path('exam/<uuid:exam_id>/candidates/', RetreiveExamCandidatesView.as_view(), name='exam_candidates'),
+    path('exam/<uuid:exam_id>/admitted_candidated_count/', RetrieveAdmittedCandidatesCount.as_view(), name='admitted_candidates_count'),
 
 ]

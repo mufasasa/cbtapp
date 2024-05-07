@@ -611,3 +611,16 @@ class RetreiveExamCandidatesView(generics.RetrieveAPIView):
         serializer = CandidateExamSerializer(candidates, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
+
+
+
+class RetrieveAdmittedCandidatesCount(generics.RetrieveAPIView):
+    """
+    fetch the count of admitted candidates of an exam by examination id
+    """
+    def get(self, request, exam_id):
+        exam = Examination.objects.get(id=exam_id)
+        candidates = CandidateExam.objects.filter(examination=exam, status="admitted")
+        count = candidates.count()
+        total_candidates =  CandidateExam.objects.filter(examination=exam).count()
+        return Response({"admitted_candidates":count, "total_candidates": total_candidates}, status=status.HTTP_200_OK)
