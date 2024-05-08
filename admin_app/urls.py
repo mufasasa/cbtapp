@@ -32,5 +32,6 @@ urlpatterns = [
     # visitors
     path('visitors/', VisitorListCreateView.as_view(), name='visitors'),
     path('visitors/<uuid:visitor_id>/', VisitorDetailView.as_view(), name='visitor_detail'),
+    path('visitors/<uuid:visitor_id>/exit/', ExitVisitorView.as_view(), name='visitor_exit'),
     
 ]

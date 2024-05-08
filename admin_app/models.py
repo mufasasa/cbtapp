@@ -39,5 +39,7 @@ class Visitor(models.Model):
     purpose = models.TextField()
     whom_to_visit = models.CharField(max_length=100, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    time_of_exit = models.DateTimeField(blank=True, null=True)
+    exited = models.BooleanField(default=False)
     def __str__(self):
         return self.name

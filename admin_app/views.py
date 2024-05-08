@@ -514,3 +514,19 @@ class AdminMarkCandidateAdmittedView(generics.UpdateAPIView):
     
 
         
+
+class ExitVisitorView(generics.UpdateAPIView):
+
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TimedAuthTokenAuthentication]
+
+    def update(self, request, visitor_id):
+
+        # get the visitor
+        visitor_instance = Visitor.objects.get(id=visitor_id)
+
+        visitor_instance.exited = True
+        visitor_instance.time_of_exit = datetime.datetime.now()
+        visitor_instance.save()
+
+        return Response({'message':'successfully exited'}, status=status.HTTP_200_OK)
