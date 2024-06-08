@@ -670,8 +670,8 @@ class CandidateBatchUploadView(generics.CreateAPIView):
                 # Create a new user for each candidate
                 user = get_user_model().objects.create_user(
                     username=row['email'],
-                    password=row['password'],
-                    email='0000'
+                    password="0000",
+                    email=row['email']
                 )
 
                 candidate_data = {
