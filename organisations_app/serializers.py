@@ -147,3 +147,8 @@ class CandidateExamSerializer(serializers.ModelSerializer):
     
     def get_exam_name(self, obj):
         return obj.examination.name
+    
+
+
+class CandidateUploadSerializer(serializers.Serializer):
+    file = serializers.FileField()

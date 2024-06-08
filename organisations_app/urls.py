@@ -14,6 +14,7 @@ urlpatterns = [
     path('organisation/exam/<uuid:exam_id>/archive_exam/', OrganisationArchiveExaminationView.as_view(), name='organisation_exam_archive'),
     path('organisation/candidates/',OrganisationListCreateCandidatesView.as_view(), name='organisation_candidates'),
     path('organisation/candidates/<uuid:candidate_id>/', OrganisationCandidateDetailView.as_view(), name='organisation_candidate_detail'),
+    path('organisation/<uuid:organisation_id>/upload_candidates/', CandidateBatchUploadView.as_view(), name='upload_candidates'),
 
     path('organisation/complains/', OrganisationComplainListCreateView.as_view(), name='organisation_complains'),
     path('organisation/complains/<uuid:complain_id>/', OrganisationComplainDetailView.as_view(), name='organisation_complain_detail'),

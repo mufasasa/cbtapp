@@ -11,8 +11,7 @@ from rest_framework.pagination import PageNumberPagination
 from utills_app.serializers import FileUploadSerializer
 from utills_app.models import FileUpload
 from .utils import *
-
-
+import pandas as pd
 
 
 
@@ -79,6 +78,14 @@ class CandidateListCreateView(generics.ListCreateAPIView):
     # list all candidates
     def get(self, request):
         candidates = Candidate.objects.all()
+
+        if request.query_params.get('name'):
+            # search for either first name or last name containig name
+            candidates = candidates.filter(first_name__icontains=request.query_params.get('name')) | candidates.filter(last_name__icontains=request.query_params.get('name'))
+
+        if request.query_params.get('email'):
+            candidates = candidates.filter(email__icontains=request.query_params.get('email'))
+
         serializer = CandidateSerializer(candidates, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
@@ -523,8 +530,8 @@ class OrganisationComplainDetailView(generics.RetrieveUpdateDestroyAPIView):
         complain = OrganisationComplain.objects.get(pk=complain_id)
         organisation_instance = complain.organisation
 
-        if not user_is_staff_of_organization(request.user, organisation_instance):
-            return Response(status=status.HTTP_403_FORBIDDEN)
+        # if not user_is_staff_of_organization(request.user, organisation_instance):
+        #     return Response(status=status.HTTP_403_FORBIDDEN)
         
         serializer = OrganisationComplainSerializer(complain)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -624,3 +631,105 @@ class RetrieveAdmittedCandidatesCount(generics.RetrieveAPIView):
         count = candidates.count()
         total_candidates =  CandidateExam.objects.filter(examination=exam).count()
         return Response({"admitted_candidates":count, "total_candidates": total_candidates}, status=status.HTTP_200_OK)
+    
+
+
+
+class CandidateBatchUploadView(generics.CreateAPIView):
+    """
+    API view to upload a batch of candidates from an Excel or CSV file.
+    """
+    serializer_class = CandidateUploadSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TimedAuthTokenAuthentication]
+
+    def post(self, request, organisation_id):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        organisation = Organisation.objects.get(pk=organisation_id)
+        if not user_is_staff_of_organization(request.user, organisation):
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        file = request.FILES['file']
+        file_extension = file.name.split('.')[-1]
+
+        # Read the file into a pandas DataFrame
+        if file_extension == 'csv':
+            df = pd.read_csv(file)
+        elif file_extension in ['xls', 'xlsx']:
+            df = pd.read_excel(file)
+        else:
+            return Response({"error": "Unsupported file format"}, status=status.HTTP_400_BAD_REQUEST)
+
+        candidates = []
+        errors = []
+
+        for index, row in df.iterrows():
+            try:
+                # Create a new user for each candidate
+                user = get_user_model().objects.create_user(
+                    username=row['email'],
+                    password=row['password'],
+                    email='0000'
+                )
+
+                candidate_data = {
+                    'first_name': row['first_name'],
+                    'last_name': row['last_name'],
+                    'nin': row.get('nin', ''),
+                    'email': row['email'],
+                    'phone': row.get('phone', ''),
+                    'phone2': row.get('phone2', ''),
+                    'photo': None,  # Assuming the photo field will be handled separately
+                    'organisation_id': organisation.id,
+                    'user': user.id
+                }
+
+                candidate_serializer = CandidateSerializer(data=candidate_data)
+                if candidate_serializer.is_valid(raise_exception=True):
+                    candidates.append(candidate_serializer.save())
+            except Exception as e:
+                errors.append({"row": index, "error": str(e)})
+
+        if errors:
+            return Response({"errors": errors}, status=status.HTTP_400_BAD_REQUEST)
+        
+        return Response({"message": f"{len(candidates)} candidates created successfully."}, status=status.HTTP_201_CREATED)
+    
+
+
+class CandidateExamDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = CandidateExam.objects.all()
+    serializer_class = Candidate
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TimedAuthTokenAuthentication]
+
+    # retrieve a candidate exam
+    def get(self, request, candidate_exam_id):
+        candidate_exam = CandidateExam.objects.get(pk=candidate_exam_id)
+        exam = candidate_exam.examination
+        organisation_instance = exam.organisation
+        if not user_is_staff_of_organization(request.user, organisation_instance):
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
+        serializer = CandidateExamSerializer(candidate_exam)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+
+class DeactivateOrganisationAccount(generics.UpdateAPIView):
+    queryset = Organisation.objects.all()
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TimedAuthTokenAuthentication]
+
+    def put(self, request, organisation_id):
+        organisation = Organisation.objects.get(pk=organisation_id)
+        if not user_is_staff_of_organization(request.user, organisation):
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
+        organisation.active = False
+        organisation.save()
+        return Response(status=status.HTTP_200_OK)
+    
+
