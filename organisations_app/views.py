@@ -725,7 +725,7 @@ class DeactivateOrganisationAccount(generics.UpdateAPIView):
 
     def put(self, request, organisation_id):
         organisation = Organisation.objects.get(pk=organisation_id)
-        if not user_is_staff_of_organization(request.user, organisation):
+        if  user_is_staff_of_organization(request.user, organisation) == False:
             return Response(status=status.HTTP_403_FORBIDDEN)
         
         organisation.active = False
