@@ -710,7 +710,7 @@ class CandidateExamDetailView(generics.RetrieveUpdateDestroyAPIView):
         candidate_exam = CandidateExam.objects.get(pk=candidate_exam_id)
         exam = candidate_exam.examination
         organisation_instance = exam.organisation
-        if not user_is_staff_of_organization(request.user, organisation_instance):
+        if user_is_staff_of_organization(request.user, organisation_instance) == False:
             return Response(status=status.HTTP_403_FORBIDDEN)
         
         serializer = CandidateExamSerializer(candidate_exam)
