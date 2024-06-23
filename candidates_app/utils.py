@@ -8,7 +8,7 @@ def auto_grade_exam(candidate_exam:CandidateExam, examination:Examination) -> Ca
 
     # form a dictionary of question ids with answers and scores.
 
-    question_id_score_answer_dict = defaultdict(str)
+    question_id_score_answer_dict = {}
 
     for question in examination.questions:
         question_id = question.get('id')
