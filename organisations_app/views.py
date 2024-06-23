@@ -689,7 +689,7 @@ class CandidateBatchUploadView(generics.CreateAPIView):
                     'phone': row.get('phone', ''),
                     'phone2': row.get('phone2', ''),
                     'photo': None,  # Assuming the photo field will be handled separately
-                    'organisation_id': organisation,
+                    'organisation': organisation,
                     'user': user.id
                 }
 
