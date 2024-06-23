@@ -52,5 +52,8 @@ class SubmitCandidateExam(generics.UpdateAPIView):
             
             candidate_exam = auto_grade_exam(candidate_exam, exam)
 
+            data = CandidateExamSerializer(candidate_exam).data
 
-        return Response(status=status.HTTP_200_OK)
+
+
+        return Response(status=status.HTTP_200_OK, data=data)
