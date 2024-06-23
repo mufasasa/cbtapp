@@ -668,11 +668,18 @@ class CandidateBatchUploadView(generics.CreateAPIView):
         for index, row in df.iterrows():
             try:
                 # Create a new user for each candidate
-                user = get_user_model().objects.create_user(
-                    username=row['email'],
-                    password="0000",
-                    email=row['email']
-                )
+
+                # try creatinng a user with the email
+
+                try:
+                    user = get_user_model().objects.create_user(
+                        username=row['email'],
+                        password="0000",
+                        email=row['email']
+                    )
+                except Exception as e:
+                    user = get_user_model().objects.get(username=row['email'])
+
 
                 candidate_data = {
                     'first_name': row['first_name'],
@@ -682,7 +689,7 @@ class CandidateBatchUploadView(generics.CreateAPIView):
                     'phone': row.get('phone', ''),
                     'phone2': row.get('phone2', ''),
                     'photo': None,  # Assuming the photo field will be handled separately
-                    'organisation_id': organisation.id,
+                    'organisation_id': organisation,
                     'user': user.id
                 }
 
