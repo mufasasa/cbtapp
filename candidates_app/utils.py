@@ -24,7 +24,7 @@ def auto_grade_exam(candidate_exam:CandidateExam, examination:Examination) -> Ca
     total_score = 0
     for question in candidate_exam.candidate_answers:
         question_id = question.get('question_id')
-        candidate_answer = question.get('answer')
+        candidate_answer = question.get('response')
 
         question_data = question_id_score_answer_dict.get(question_id)
 
@@ -33,6 +33,7 @@ def auto_grade_exam(candidate_exam:CandidateExam, examination:Examination) -> Ca
 
     # update the candidate exam with the total score
     candidate_exam.score = total_score
+    candidate_exam.status = 'admitted'
     candidate_exam.save()
 
     return candidate_exam

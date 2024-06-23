@@ -43,7 +43,7 @@ class SubmitCandidateExam(generics.UpdateAPIView):
         
         exam = candidate_exam.examination
         
-        data = request.data
+        data = request.data.get('questions')
         candidate_exam.candidate_answers = data
         candidate_exam.save()
 
