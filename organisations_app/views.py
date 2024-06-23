@@ -186,7 +186,10 @@ class OrganisationListCreateExamsView(generics.ListCreateAPIView):
         if not user_is_staff_of_organization(request.user, Organisation.objects.get(pk=organisation_id)):
             return Response(status=status.HTTP_403_FORBIDDEN)
         
-        serializer = CreateExamSerializer(data=request.data)
+        mutable_data = request.data.copy()
+        mutable_data['questions'] = validate_questions(request.data['questions'])
+        
+        serializer = CreateExamSerializer(data=mutable_data)
 
         if serializer.is_valid():
             exam = serializer.save()
@@ -241,7 +244,7 @@ class OrganisationExaminationDetailView(generics.RetrieveUpdateDestroyAPIView):
         exam.instructions = request.data['instructions'] if 'instructions' in request.data else exam.instructions
         exam.total_marks = request.data['total_marks'] if 'total_marks' in request.data else exam.total_marks
         exam.passing_marks = request.data['passing_marks'] if 'passing_marks' in request.data else exam.passing_marks
-        exam.questions = request.data['questions'] if 'questions' in request.data else exam.questions
+        exam.questions = validate_questions(request.data['questions']) if 'questions' in request.data else exam.questions
         exam.save()
 
         

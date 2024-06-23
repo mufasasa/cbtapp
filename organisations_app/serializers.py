@@ -55,7 +55,7 @@ class CreateExamSerializer(serializers.Serializer):
             total_marks=validated_data.get('total_marks'),
             passing_marks=validated_data.get('passing_marks'),
             organisation=organisation,
-            auto_grade=validated_data.get('auto_grade', False)
+            auto_grade=validated_data.get('auto_grade', True)
         )
         if 'candidates' in validated_data:
             for candidate_id in validated_data['candidates']:
