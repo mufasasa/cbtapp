@@ -23,7 +23,7 @@ def auto_grade_exam(candidate_exam:CandidateExam, examination:Examination) -> Ca
     # mark the exam
     total_score = 0
     for question in candidate_exam.candidate_answers:
-        question_id = question.get('question_id')
+        question_id = question.get('id')
         candidate_answer = question.get('response')
 
         question_data = question_id_score_answer_dict.get(question_id)
