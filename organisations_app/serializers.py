@@ -46,43 +46,38 @@ class CreateExamSerializer(serializers.Serializer):
         organisation = Organisation.objects.get(pk=validated_data['organisation'])
         exam = Examination.objects.create(
             name=validated_data['name'],
-            description=validated_data['description'] if 'description' in validated_data else None,
-            start_time=validated_data['start_time'] if 'start_time' in validated_data else None,
-            end_time=validated_data['end_time'] if 'end_time' in validated_data else None,
-            duration=validated_data['duration'] if 'duration' in validated_data else None,
-            instructions=validated_data['instructions'] if 'instructions' in validated_data else None,
+            description=validated_data.get('description'),
+            start_time=validated_data.get('start_time'),
+            end_time=validated_data.get('end_time'),
+            duration=validated_data.get('duration'),
+            instructions=validated_data.get('instructions'),
             questions=validated_data.get('questions', []),
-            total_marks=validated_data['total_marks'] if 'total_marks' in validated_data else None,
-            passing_marks=validated_data['passing_marks'] if 'passing_marks' in validated_data else None,
+            total_marks=validated_data.get('total_marks'),
+            passing_marks=validated_data.get('passing_marks'),
             organisation=organisation,
-            auto_grade = validated_data.get('auto_grade', False)
+            auto_grade=validated_data.get('auto_grade', False)
         )
-        # add the candidates, which is a many to many field
         if 'candidates' in validated_data:
             for candidate_id in validated_data['candidates']:
                 candidate = Candidate.objects.get(pk=candidate_id)
                 exam.candidates.add(candidate)
         return exam
     
-
     def validate(self, data):
-        """
-        Validate if the exam can be auto-graded based on the type of questions.
-        """
         if data.get('auto_grade'):
             all_objective = all(question.get('type') == 'objective' for question in data.get('questions', []))
             if not all_objective:
                 raise serializers.ValidationError("All questions must be of type 'objective' for auto-grading.")
-            
-        # Check each question for a 'score' and assign default if missing also assign 'id' to each question
+
+        questions = []
         for question in data.get('questions', []):
             if 'score' not in question:
                 question['score'] = 1  # Assign default score of 1 if not specified
-            
-            # Assign a new UUID as id if not provided
             if 'id' not in question:
-                question['id'] = str(uuid.uuid4())
-
+                question['id'] = str(uuid.uuid4())  # Assign a new UUID as id if not provided
+            questions.append(question)
+        
+        data['questions'] = questions
         return data
 
 class OrganisationCreateSerializer(serializers.Serializer):
