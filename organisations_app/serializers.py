@@ -29,57 +29,54 @@ class ExaminationDetailSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class CreateExamSerializer(serializers.Serializer):
-    name = serializers.CharField()
-    description = serializers.CharField(required=False)
-    start_time = serializers.DateTimeField()
-    end_time = serializers.DateTimeField()
-    duration = serializers.IntegerField(required=False)
-    instructions = serializers.CharField(required=False)
-    total_marks = serializers.IntegerField(required=False)
-    passing_marks = serializers.IntegerField(required=False)
-    questions = serializers.ListField(child=serializers.DictField(), required=False, allow_empty=True)
-    candidates = serializers.ListField(child=serializers.UUIDField(), required=False, allow_empty=True)
-    organisation = serializers.UUIDField()
+class ExaminationQuestionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Question
+        fields = '__all__'
+
+
+class CreateExamSerializer(serializers.ModelSerializer):
+    candidates = serializers.ListField(child=serializers.UUIDField(), required=False, allow_empty=True, write_only=True)
+    questions = ExaminationQuestionSerializer(many=True, required=False, allow_empty=True)
+
+    class Meta:
+        model = Examination
+        fields = ['name', 'description', 'start_time', 'end_time', 'duration', 'instructions', 
+                  'total_marks', 'passing_marks', 'questions', 'candidates', 'organisation', 'auto_grade']
+        extra_kwargs = {
+            'description': {'required': False},
+            'duration': {'required': False},
+            'instructions': {'required': False},
+            'total_marks': {'required': False},
+            'passing_marks': {'required': False},
+            'auto_grade': {'required': False, 'default': True},
+        }
 
     def create(self, validated_data):
-        organisation = Organisation.objects.get(pk=validated_data['organisation'])
-        exam = Examination.objects.create(
-            name=validated_data['name'],
-            description=validated_data.get('description'),
-            start_time=validated_data.get('start_time'),
-            end_time=validated_data.get('end_time'),
-            duration=validated_data.get('duration'),
-            instructions=validated_data.get('instructions'),
-            questions=validated_data.get('questions', []),
-            total_marks=validated_data.get('total_marks'),
-            passing_marks=validated_data.get('passing_marks'),
-            organisation=organisation,
-            auto_grade=validated_data.get('auto_grade', True)
-        )
-        if 'candidates' in validated_data:
-            for candidate_id in validated_data['candidates']:
-                candidate = Candidate.objects.get(pk=candidate_id)
-                exam.candidates.add(candidate)
+        questions_data = validated_data.pop('questions', [])
+        
+        exam = Examination.objects.create(**validated_data)
+        
+        for question_data in questions_data:
+            Question.objects.create(
+                examination=exam,
+                question_text=question_data.get('question_text'),
+                question_type=question_data.get('question_type', 'multiple_choice'),
+                options=question_data.get('options', []),
+                correct_answer=question_data.get('correct_answer', {}),
+                marks=question_data.get('score', 1)
+            )
+        exam.save()
         return exam
     
     def validate(self, data):
         if data.get('auto_grade'):
-            all_objective = all(question.get('type') == 'objective' for question in data.get('questions', []))
+            all_objective = all(question.get('question_type') in ['multiple_choice', 'true_false', 'multiple_select'] for question in data.get('questions', []))
             if not all_objective:
-                raise serializers.ValidationError("All questions must be of type 'objective' for auto-grading.")
+                raise serializers.ValidationError("All questions must be of type 'multiple_choice', 'true_false' or 'multiple_select' for auto-grading.")
 
-        questions = []
-        for question in data.get('questions', []):
-            if 'score' not in question:
-                question['score'] = 1  # Assign default score of 1 if not specified
-            if 'id' not in question:
-                question['id'] = str(uuid.uuid4())  # Assign a new UUID as id if not provided
-            questions.append(question)
-        
-        data['questions'] = questions
         return data
-
+    
 class OrganisationCreateSerializer(serializers.Serializer):
     name = serializers.CharField()
     address = serializers.CharField()

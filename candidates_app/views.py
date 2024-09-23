@@ -43,18 +43,25 @@ class SubmitCandidateExam(generics.UpdateAPIView):
         
         exam = candidate_exam.examination
         
-        data = request.data.get('questions')
-        candidate_exam.candidate_answers = data
+        submitted_answers = request.data.get('answers', [])
+        
+        for answer_data in submitted_answers:
+            question_id = answer_data.get('question_id')
+            answer = answer_data.get('answer')
+            
+            question = Question.objects.get(id=question_id, examination=exam)
+            
+            CandidateAnswer.objects.create(
+                candidate=candidate_exam.candidate,
+                question=question,
+                answer=answer
+            )
+        
+        candidate_exam.status = 'submitted'
         candidate_exam.save()
 
-        # auto grade the exam if auto grade is  set  to true
+        # Auto grade the exam if auto_grade is set to true
         if exam.auto_grade:
-            
-            candidate_exam = auto_grade_exam(candidate_exam, exam)
+            candidate_exam.auto_grade_exam()
 
-            data = {'score':candidate_exam.score,
-                    'status':candidate_exam.status}
-
-
-
-        return Response(status=status.HTTP_200_OK, data=data)
+        return Response(status=status.HTTP_200_OK)

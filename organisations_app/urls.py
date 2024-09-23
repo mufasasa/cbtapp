@@ -22,8 +22,17 @@ urlpatterns = [
     path('exam/<uuid:exam_id>/admitted_candidates_count/', RetrieveAdmittedCandidatesCount.as_view(), name='admitted_candidates_count'),
 
     path('candidate_exam/<uuid:candidate_exam_id>/', CandidateExamDetailView.as_view(), name='candidate_exam_detail'),
+    path('candidate_exam/<uuid:candidate_id>/<uuid:exam_id>/analysis/', CandidateAnalysisReportView.as_view(), name='candidate_exam_analysis_report'),
 
     path('organisation/<uuid:organisation_id>/deactivate/', DeactivateOrganisationAccount.as_view(), name='deactivate_organisation'),
+
+    path('exam/<uuid:exam_id>/questions/', ExamQuestionListCreateView.as_view(), name='exam_question_list_create'),
+    path('exam/<uuid:exam_id>/questions/<uuid:pk>/', ExamQuestionDetailView.as_view(), name='exam_question_detail'),
+
+    path('exam/<uuid:exam_id>/candidate/<uuid:candidate_id>/extend_time/', ExtendCandidateExamTimeView.as_view(), name='extend_candidate_exam_time'),
+
+    path('exam/<uuid:exam_id>/question/<uuid:question_id>/analysis/', QuestionAnalysisReportView.as_view(), name='question_analysis_report'),
+    path('exam/<uuid:exam_id>/analysis/', ExamAnalysisReportView.as_view(), name='exam_analysis_report'),
     
 
 ]

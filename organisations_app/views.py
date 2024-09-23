@@ -186,10 +186,7 @@ class OrganisationListCreateExamsView(generics.ListCreateAPIView):
         if not user_is_staff_of_organization(request.user, Organisation.objects.get(pk=organisation_id)):
             return Response(status=status.HTTP_403_FORBIDDEN)
         
-        mutable_data = request.data.copy()
-        mutable_data['questions'] = validate_questions(request.data['questions'])
-        
-        serializer = CreateExamSerializer(data=mutable_data)
+        serializer = CreateExamSerializer(data=request.data)
 
         if serializer.is_valid():
             exam = serializer.save()
@@ -206,7 +203,6 @@ class OrganisationListCreateExamsView(generics.ListCreateAPIView):
                 )
 
             return Response({"message":"successfull", "id":exam_id}, status=status.HTTP_201_CREATED)
-        
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
@@ -244,7 +240,6 @@ class OrganisationExaminationDetailView(generics.RetrieveUpdateDestroyAPIView):
         exam.instructions = request.data['instructions'] if 'instructions' in request.data else exam.instructions
         exam.total_marks = request.data['total_marks'] if 'total_marks' in request.data else exam.total_marks
         exam.passing_marks = request.data['passing_marks'] if 'passing_marks' in request.data else exam.passing_marks
-        exam.questions = validate_questions(request.data['questions']) if 'questions' in request.data else exam.questions
         exam.save()
 
         
@@ -743,3 +738,132 @@ class DeactivateOrganisationAccount(generics.UpdateAPIView):
         return Response(status=status.HTTP_200_OK)
     
 
+
+class ExamQuestionListCreateView(generics.ListCreateAPIView):
+    queryset = Question.objects.all()
+    serializer_class = ExaminationQuestionSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TimedAuthTokenAuthentication]
+
+    def get_queryset(self):
+        exam_id = self.kwargs.get('exam_id')
+        return Question.objects.filter(examination_id=exam_id)
+
+    def perform_create(self, serializer):
+        exam_id = self.kwargs.get('exam_id')
+        examination = Examination.objects.get(pk=exam_id)
+        serializer.save(examination=examination)
+
+class ExamQuestionDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Question.objects.all()
+    serializer_class = ExaminationQuestionSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TimedAuthTokenAuthentication]
+
+    def get_object(self):
+        exam_id = self.kwargs.get('exam_id')
+        question_id = self.kwargs.get('pk')
+        return Question.objects.get(examination_id=exam_id, pk=question_id)
+
+    def perform_update(self, serializer):
+        exam_id = self.kwargs.get('exam_id')
+        examination = Examination.objects.get(pk=exam_id)
+        serializer.save(examination=examination)
+
+    def perform_destroy(self, instance):
+        instance.delete()
+
+
+class ExtendCandidateExamTimeView(generics.UpdateAPIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TimedAuthTokenAuthentication]
+
+    def put(self, request, exam_id, candidate_id):
+        try:
+            exam = Examination.objects.get(pk=exam_id)
+            candidate = Candidate.objects.get(pk=candidate_id)
+            
+            if not user_is_staff_of_organization(request.user, exam.organisation):
+                return Response({"error": "You don't have permission to perform this action."}, status=status.HTTP_403_FORBIDDEN)
+            
+            candidate_exam = CandidateExam.objects.get(examination=exam, candidate=candidate)
+            
+            extension_time = request.data.get('extension_time')
+            if not extension_time:
+                return Response({"error": "Extension time is required."}, status=status.HTTP_400_BAD_REQUEST)
+            
+            try:
+                extension_time = int(extension_time)
+            except ValueError:
+                return Response({"error": "Extension time must be an integer."}, status=status.HTTP_400_BAD_REQUEST)
+            
+            candidate_exam.extend_exam_time(extension_time)
+            
+            return Response({"message": f"Exam time extended by {extension_time} minutes for candidate {candidate.id}"}, status=status.HTTP_200_OK)
+        
+        except Examination.DoesNotExist:
+            return Response({"error": "Examination not found."}, status=status.HTTP_404_NOT_FOUND)
+        except Candidate.DoesNotExist:
+            return Response({"error": "Candidate not found."}, status=status.HTTP_404_NOT_FOUND)
+        except CandidateExam.DoesNotExist:
+            return Response({"error": "Candidate exam not found."}, status=status.HTTP_404_NOT_FOUND)
+
+
+
+class CandidateAnalysisReportView(generics.RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TimedAuthTokenAuthentication]
+
+    def get(self, request, candidate_id, exam_id):
+        try:
+            candidate = Candidate.objects.get(pk=candidate_id)
+            exam = Examination.objects.get(pk=exam_id)
+            
+            if not user_is_staff_of_organization(request.user, exam.organisation):
+                return Response({"error": "You don't have permission to access this report."}, status=status.HTTP_403_FORBIDDEN)
+            
+            candidate_exam = CandidateExam.objects.get(examination=exam, candidate=candidate)
+            
+            report = candidate_exam.get_analysis_report()
+            return Response(report, status=status.HTTP_200_OK)
+        
+        except (Candidate.DoesNotExist, Examination.DoesNotExist, CandidateExam.DoesNotExist):
+            return Response({"error": "Requested data not found."}, status=status.HTTP_404_NOT_FOUND)
+
+
+class QuestionAnalysisReportView(generics.RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TimedAuthTokenAuthentication]
+
+    def get(self, request, question_id):
+        try:
+            question = Question.objects.get(pk=question_id)
+            
+            if not user_is_staff_of_organization(request.user, question.examination.organisation):
+                return Response({"error": "You don't have permission to access this report."}, status=status.HTTP_403_FORBIDDEN)
+            
+            report = question.get_question_analysis_report()
+            
+            return Response(report, status=status.HTTP_200_OK)
+        
+        except Question.DoesNotExist:
+            return Response({"error": "Question not found."}, status=status.HTTP_404_NOT_FOUND)
+
+
+class ExamAnalysisReportView(generics.RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TimedAuthTokenAuthentication]
+
+    def get(self, request, exam_id):
+        try:
+            exam = Examination.objects.get(pk=exam_id)
+            
+            if not user_is_staff_of_organization(request.user, exam.organisation):
+                return Response({"error": "You don't have permission to access this report."}, status=status.HTTP_403_FORBIDDEN)
+            
+            report = exam.get_exam_analysis()
+            
+            return Response(report, status=status.HTTP_200_OK)
+        
+        except Examination.DoesNotExist:
+            return Response({"error": "Examination not found."}, status=status.HTTP_404_NOT_FOUND)
