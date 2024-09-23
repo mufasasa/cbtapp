@@ -22,11 +22,16 @@ class ExaminationSerializer(serializers.ModelSerializer):
 
 
 class ExaminationDetailSerializer(serializers.ModelSerializer):
+    questions = serializers.SerializerMethodField()
     candidates = CandidateSerializer(many=True)
     
     class Meta:
         model = Examination
         fields = '__all__'
+
+    def get_questions(self, obj):
+        questions = obj.questions.all()
+        return [{'id': question.id, 'text': question.text, 'question_type': question.question_type, 'marks': question.marks, 'options': question.options} for question in questions]
 
 
 class ExaminationQuestionSerializer(serializers.ModelSerializer):

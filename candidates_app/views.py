@@ -25,8 +25,7 @@ class FetchCandidateExamView(generics.RetrieveAPIView):
             return Response(status=status.HTTP_403_FORBIDDEN)
         
         exam = candidate_exam.examination
-        # modify the cndidate exam questions to remove the answer property
-        exam.questions = [{**question, 'answer': None} for question in exam.questions] 
+        
         serializer = ExaminationDetailSerializer(exam)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
