@@ -35,9 +35,36 @@ class ExaminationDetailSerializer(serializers.ModelSerializer):
 
 
 class ExaminationQuestionSerializer(serializers.ModelSerializer):
+    options = serializers.ListField(child=serializers.DictField(), required=False)
+
     class Meta:
         model = Question
-        fields = '__all__'
+        fields = ['id', 'question_text', 'question_type', 'options', 'correct_answer', 'marks']
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['options'] = [
+            {
+                'id': option['id'],
+                'text': option['text'],
+                'correct': option['correct']
+            }
+            for option in instance.options
+        ]
+        return representation
+
+    def to_internal_value(self, data):
+        internal_value = super().to_internal_value(data)
+        options = data.get('options', [])
+        internal_value['options'] = [
+            {
+                'id': i,
+                'text': option.get('text', ''),
+                'correct': option.get('correct', False)
+            }
+            for i, option in enumerate(options, 1)
+        ]
+        return internal_value
 
 
 class CreateExamSerializer(serializers.ModelSerializer):
@@ -63,12 +90,29 @@ class CreateExamSerializer(serializers.ModelSerializer):
         exam = Examination.objects.create(**validated_data)
         
         for question_data in questions_data:
+            options = [
+                {
+                    'id': i, 
+                    'text': option.get('text', ''),
+                    'correct': option.get('correct', False)
+                } 
+                for i, option in enumerate(question_data.get('options', []), 1)
+            ]
+
+            # get the correct answer from the options
+            if question_data.get('question_type') in ['multiple_choice', 'true_false']:
+                correct_answer = {'answer': next((option['id'] for option in options if option['correct']), None)}
+            elif question_data.get('question_type') == 'multiple_select':
+                correct_answer = {'answers': [option['id'] for option in options if option['correct']]}
+            else:
+                correct_answer = {}
+            
             Question.objects.create(
                 examination=exam,
                 question_text=question_data.get('question_text'),
                 question_type=question_data.get('question_type', 'multiple_choice'),
-                options=question_data.get('options', []),
-                correct_answer=question_data.get('correct_answer', {}),
+                options=options,
+                correct_answer=correct_answer,
                 marks=question_data.get('score', 1)
             )
         exam.save()

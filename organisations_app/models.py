@@ -308,27 +308,24 @@ class CandidateExam(models.Model):
     def auto_grade_exam(self):
         if self.examination.auto_grade:
             auto_gradable_types = ['multiple_choice', 'multiple_select', 'fill_in_the_blank']
-            all_questions = self.examination.questions
+            all_questions:list[Question] = self.examination.questions.all()
             
-            if all(question['type'] in auto_gradable_types for question in all_questions):
+            if all(question.question_type in auto_gradable_types for question in all_questions):
                 total_score = 0
                 for question in all_questions:
                     answer = CandidateAnswer.objects.filter(candidate=self.candidate, question__id=question['id']).first()
                     if answer:
-                        if question['type'] in ['multiple_choice', 'multiple_select']:
-                            correct_options = set(question['correct_answer'])
-                            selected_options = set(answer.answer)
-                            if correct_options == selected_options:
-                                total_score += question['marks']
-                                answer.score = question['marks']
-                            else:
-                                answer.score = 0
-                        elif question['type'] == 'fill_in_the_blank':
-                            if answer.answer.lower().strip() == question['correct_answer'].lower().strip():
-                                total_score += question['marks']
-                                answer.score = question['marks']
-                            else:
-                                answer.score = 0
+                        if question.question_type == 'multiple_choice':
+                            answer.mark_multiple_choice()
+                            total_score += answer.score
+                        elif question.question_type == 'multiple_select':
+                            answer.mark_multiple_select()
+                            total_score += answer.score
+                        elif question.question_type == 'fill_in_the_blank':
+                            answer.mark_fill_in_the_blank()
+                            total_score += answer.score
+                        else:
+                            answer.score = 0
                         answer.save()
                 
                 self.score = total_score
