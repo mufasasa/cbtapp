@@ -87,8 +87,18 @@ class CreateExamSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         questions_data = validated_data.pop('questions', [])
         
-        exam = Examination.objects.create(**validated_data)
-        
+        exam = Examination.objects.create(
+            name=validated_data['name'],
+            description=validated_data.get('description', ''),
+            start_time=validated_data['start_time'],
+            end_time=validated_data['end_time'],
+            duration=validated_data.get('duration'),
+            instructions=validated_data.get('instructions', ''),
+            total_marks=validated_data.get('total_marks', 0),
+            passing_marks=validated_data.get('passing_marks', 0),
+            organisation=validated_data['organisation'],
+            auto_grade=validated_data.get('auto_grade', True)
+        )
         for question_data in questions_data:
             options = [
                 {

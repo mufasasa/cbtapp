@@ -338,18 +338,16 @@ class OrganisationListCreateCandidatesView(generics.ListCreateAPIView):
         # create a new candidate
         canditate_instance = Candidate.objects.create(
             user=user,
-            first_name=request.data['first_name'],
-            last_name=request.data['last_name'],
-            nin=request.data['nin'],
-            email=request.data['email'],
-            phone=request.data['phone'],
-            phone2=request.data['phone2'] if 'phone2' in request.data else None,
-            photo=request.data['photo'] if 'photo' in request.data else None,
+            first_name=request.data.get('first_name', None),
+            last_name=request.data.get('last_name', None),
+            nin=request.data.get('nin', None),
+            email=request.data.get('email', None),
+            phone=request.data.get('phone', None),
+            phone2=request.data.get('phone2', None),
+            photo=request.data.get('photo', None),
         )
         canditate_instance.organisation = organisation_instance
         canditate_instance.save()
-        
-
         
         return Response({
             "message":"candidate created successfull",
