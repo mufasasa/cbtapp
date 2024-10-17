@@ -64,6 +64,16 @@ class ExaminationQuestionSerializer(serializers.ModelSerializer):
             }
             for i, option in enumerate(options, 1)
         ]
+
+        # Set the correct answer from the options
+        question_type = data.get('question_type')
+        if question_type in ['multiple_choice', 'true_false']:
+            correct_answer = next((option['id'] for option in internal_value['options'] if option['correct']), None)
+            internal_value['correct_answer'] = {'answer': correct_answer}
+        elif question_type == 'multiple_select':
+            correct_answers = [option['id'] for option in internal_value['options'] if option['correct']]
+            internal_value['correct_answer'] = {'answers': correct_answers}
+        
         return internal_value
 
 
