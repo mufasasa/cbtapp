@@ -216,13 +216,16 @@ class OrganisationExaminationDetailView(generics.RetrieveUpdateDestroyAPIView):
     # retrieve an examination
     def get(self, request, exam_id):
         exam = Examination.objects.get(pk=exam_id)
+        exam_questions = exam.questions.all()
+        questions_serializer = ExaminationQuestionSerializer(exam_questions, many=True)
         organisation = exam.organisation
         # if not user_is_staff_of_organization(request.user, organisation):
         #     return Response(status=status.HTTP_403_FORBIDDEN)
         
         serializer = ExaminationSerializer(exam)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    
+        data = serializer.data
+        data['questions'] = questions_serializer.data
+        return Response(data, status=status.HTTP_200_OK)
 
     # update an examination
     def put(self, request, exam_id):
