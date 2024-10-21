@@ -31,7 +31,7 @@ class ExaminationDetailSerializer(serializers.ModelSerializer):
 
     def get_questions(self, obj):
         questions = obj.questions.all()
-        return [{'id': question.id, 'text': question.text, 'question_type': question.question_type, 'marks': question.marks, 'options': question.options} for question in questions]
+        return [{'id': question.id, 'question_text': question.question_text, 'question_type': question.question_type, 'marks': question.marks, 'options': question.options} for question in questions]
 
 
 class ExaminationQuestionSerializer(serializers.ModelSerializer):

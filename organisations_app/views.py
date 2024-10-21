@@ -172,10 +172,10 @@ class OrganisationListCreateExamsView(generics.ListCreateAPIView):
 
         page = self.paginator.paginate_queryset(exams, request)
         if page is not None:
-            serializer = ExaminationSerializer(page, many=True)
+            serializer = ExaminationDetailSerializer(page, many=True)
             return self.paginator.get_paginated_response(serializer.data)
         
-        serializer = ExaminationSerializer(exams, many=True)
+        serializer = ExaminationDetailSerializer(exams, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
 
