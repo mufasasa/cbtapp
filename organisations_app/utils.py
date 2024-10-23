@@ -1,6 +1,7 @@
 import random
 import string
 from rest_framework.exceptions import ValidationError
+from organisations_app.models import Question
 import uuid
 
 
@@ -25,3 +26,16 @@ def validate_questions(questions, auto_grade=False):
         validated_questions.append(question)
         
     return validated_questions
+
+
+def update_questions(questions:list[dict]):
+    for question in questions:
+        try:    
+            question_obj = Question.objects.get(pk=question['id'])
+            question_obj.question_text = question['question_text'] if 'question_text' in question else question_obj.question_text
+            question_obj.options = question['options'] if 'options' in question else question_obj.options
+            question_obj.marks = question['score'] if 'score' in question else question_obj.marks
+            question_obj.save()
+        except Question.DoesNotExist:
+            raise ValidationError(f"Question with id {question['id']} does not exist")
+    return questions

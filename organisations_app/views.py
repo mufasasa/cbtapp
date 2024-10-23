@@ -243,6 +243,8 @@ class OrganisationExaminationDetailView(generics.RetrieveUpdateDestroyAPIView):
         exam.instructions = request.data['instructions'] if 'instructions' in request.data else exam.instructions
         exam.total_marks = request.data['total_marks'] if 'total_marks' in request.data else exam.total_marks
         exam.passing_marks = request.data['passing_marks'] if 'passing_marks' in request.data else exam.passing_marks
+        if 'questions' in request.data:
+            update_questions(request.data['questions'])
         exam.save()
 
         
