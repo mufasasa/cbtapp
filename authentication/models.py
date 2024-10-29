@@ -49,7 +49,7 @@ class TimedAuthToken(models.Model):
 
     def calculate_new_expiration(self):
         validity_duration = getattr(get_user_model(), 'token_validity_duration',
-                                    timedelta(days=2))
+                                    timedelta(days=200))
         self.expires = timezone.now() + validity_duration
 
     @property
