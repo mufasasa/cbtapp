@@ -6,7 +6,7 @@ from .models import *
 from django.contrib.auth import get_user_model
 from .serializers import *
 from authentication.authentication import *
-
+from organisations_app.serializers import CandidateExamQuestionSerializer
 
 
 
@@ -130,6 +130,8 @@ class CandidateLogin(generics.CreateAPIView):
                 return Response({'error': 'Invalid password'}, status=status.HTTP_400_BAD_REQUEST)
 
             token = TimedAuthToken.objects.create(user=candidate_exam.candidate.user)
+            exam_questions = Question.objects.filter(examination=candidate_exam.examination)
+            exam_questions = CandidateExamQuestionSerializer(exam_questions, many=True).data
             return Response({'token': token.key,
                              'data':{
                                  "candidate":{
@@ -147,7 +149,7 @@ class CandidateLogin(generics.CreateAPIView):
                                         "instructions": candidate_exam.examination.instructions,
                                         "total_marks": candidate_exam.examination.total_marks,
                                         "passing_marks": candidate_exam.examination.passing_marks,
-                                        "questions": candidate_exam.examination.questions,
+                                        "questions": exam_questions,
                                         "status": candidate_exam.examination.status,
                                  }
                              }

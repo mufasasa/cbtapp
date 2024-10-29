@@ -81,6 +81,28 @@ class ExaminationQuestionSerializer(serializers.ModelSerializer):
         return internal_value
 
 
+class CandidateExamQuestionSerializer(serializers.ModelSerializer):
+    """
+    This serializer is used to serialize the questions for a candidate exam
+    returns the question text, options with the correct answer
+    """
+    options = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Question
+        fields = ['id', 'question_text', 'options', 'marks']
+
+    def get_options(self, obj):
+        return [
+            {
+                'id': option['id'],
+                'text': option['text'],
+                'correct': option['correct']
+            }
+            for option in obj.options
+        ]
+
+
 class CreateExamSerializer(serializers.ModelSerializer):
     candidates = serializers.ListField(child=serializers.UUIDField(), required=False, allow_empty=True, write_only=True)
     questions = ExaminationQuestionSerializer(many=True, required=False, allow_empty=True)
