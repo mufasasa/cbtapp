@@ -23,7 +23,7 @@ class ExaminationSerializer(serializers.ModelSerializer):
 
 class ExaminationDetailSerializer(serializers.ModelSerializer):
     questions = serializers.SerializerMethodField()
-    candidates = CandidateSerializer(many=True)
+    candidates = serializers.SerializerMethodField()
     
     class Meta:
         model = Examination
@@ -32,7 +32,11 @@ class ExaminationDetailSerializer(serializers.ModelSerializer):
     def get_questions(self, obj):
         questions = obj.questions.all()
         return ExaminationQuestionSerializer(questions, many=True).data
-
+    
+    def get_candidates(self, obj):
+        candidate_exams = CandidateExam.objects.filter(examination=obj)
+        candidates = [candidate_exam.candidate for candidate_exam in candidate_exams]
+        return CandidateSerializer(candidates, many=True).data
 
 class ExaminationQuestionSerializer(serializers.ModelSerializer):
     options = serializers.ListField(child=serializers.DictField(), required=False)
