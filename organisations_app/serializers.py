@@ -90,7 +90,7 @@ class CandidateExamQuestionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Question
-        fields = ['id', 'question_text', 'options', 'marks']
+        fields = ['id', 'question_text', 'options', 'marks', 'question_type']
 
     def get_options(self, obj):
         return [
