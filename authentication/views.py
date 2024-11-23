@@ -138,6 +138,7 @@ class CandidateLogin(generics.CreateAPIView):
                                      "id": str(candidate_exam.candidate.id),
                                      "name": candidate_exam.candidate.first_name + ' ' + candidate_exam.candidate.last_name,
                                      "email": candidate_exam.candidate.email,
+                                     "profile_picture": candidate_exam.candidate.photo.url if candidate_exam.candidate.photo else None,
                                  },
                                  "exam":{
                                         "id": str(candidate_exam.examination.id),
