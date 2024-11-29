@@ -313,7 +313,7 @@ class CandidateExam(models.Model):
             if all(question.question_type in auto_gradable_types for question in all_questions):
                 total_score = 0
                 for question in all_questions:
-                    answer = CandidateAnswer.objects.filter(candidate=self.candidate, question__id=question['id']).first()
+                    answer = CandidateAnswer.objects.filter(candidate=self.candidate, question=question).first()
                     if answer:
                         if question.question_type == 'multiple_choice':
                             answer.mark_multiple_choice()
