@@ -195,10 +195,16 @@ class Question(models.Model):
                 })
             elif candidate_answer.is_correct:
                 analysis['passed'] += 1
-                analysis['passed_candidates'].append(str(candidate_exam.candidate.id))
+                analysis['passed_candidates'].append({
+                    'candidate_id': str(candidate_exam.candidate.id),
+                    'candidate_name': f"{candidate_exam.candidate.first_name} {candidate_exam.candidate.last_name}"
+                })
             else:
                 analysis['failed'] += 1
-                analysis['failed_candidates'].append(str(candidate_exam.candidate.id))
+                analysis['failed_candidates'].append({
+                    'candidate_id': str(candidate_exam.candidate.id),
+                    'candidate_name': f"{candidate_exam.candidate.first_name} {candidate_exam.candidate.last_name}"
+                })
 
         return analysis
 
@@ -224,14 +230,14 @@ class CandidateAnswer(models.Model):
 
     def mark_multiple_choice(self):
         if self.question.question_type == 'multiple_choice':
-            self.is_correct = self.answer == self.question.get_correct_answer()
+            self.is_correct = self.answer.get('id') == self.question.get_correct_answer()
             self.score = self.question.marks if self.is_correct else 0
             self.save()
 
     def mark_multiple_select(self):
         if self.question.question_type == 'multiple_select':
             correct_answers = set(self.question.get_correct_answer())
-            given_answers = set(self.answer)
+            given_answers = set(answer.get('id') for answer in self.answer)
             self.is_correct = correct_answers == given_answers
             self.score = self.question.marks if self.is_correct else 0
             self.save()
