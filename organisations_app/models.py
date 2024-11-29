@@ -170,7 +170,6 @@ class Question(models.Model):
         self.save()
     
     def get_question_analysis_report(self):
-        from candidates_app.models import CandidateExam  # Import here to avoid circular import
 
         analysis = {
             'total_candidates': 0,
