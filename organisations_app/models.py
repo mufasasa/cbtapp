@@ -189,7 +189,10 @@ class Question(models.Model):
             
             if not candidate_answer:
                 analysis['not_answered'] += 1
-                analysis['not_answered_candidates'].append(str(candidate_exam.candidate.id))
+                analysis['not_answered_candidates'].append({
+                    'candidate_id': str(candidate_exam.candidate.id),
+                    'candidate_name': f"{candidate_exam.candidate.first_name} {candidate_exam.candidate.last_name}"
+                })
             elif candidate_answer.is_correct:
                 analysis['passed'] += 1
                 analysis['passed_candidates'].append(str(candidate_exam.candidate.id))
