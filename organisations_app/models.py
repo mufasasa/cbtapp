@@ -104,7 +104,6 @@ class Examination(models.Model):
         return self.start_time <= now <= self.end_time if self.start_time and self.end_time else False
     
     def get_exam_analysis(self):
-        from candidates_app.models import CandidateExam  # Import here to avoid circular import
 
         candidate_exams = CandidateExam.objects.filter(examination=self)
         total_candidates = candidate_exams.count()
