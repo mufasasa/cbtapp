@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'admin_app',
     'utills_app',
     'drf_yasg',
+    'storages',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -168,3 +169,33 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,  # You can set this to any number you prefer
 }
+
+
+# DigitalOcean Spaces Configuration
+USE_SPACES = True
+
+# Spaces credentials
+SPACES_ACCESS_KEY_ID = config('SPACES_ACCESS_KEY_ID')
+SPACES_SECRET_ACCESS_KEY = config('SPACES_SECRET_ACCESS_KEY')
+
+# Spaces configurations
+SPACES_BUCKET_NAME = 'cbt-app-bucket'
+SPACES_REGION_NAME = 'fra1'  # Frankfurt region
+SPACES_ENDPOINT_URL = f'https://{SPACES_REGION_NAME}.digitaloceanspaces.com'
+SPACES_CDN_ENDPOINT_URL = f'https://{SPACES_BUCKET_NAME}.{SPACES_REGION_NAME}.cdn.digitaloceanspaces.com'
+
+# Django Storages Configuration
+AWS_ACCESS_KEY_ID = SPACES_ACCESS_KEY_ID  # django-storages uses AWS naming
+AWS_SECRET_ACCESS_KEY = SPACES_SECRET_ACCESS_KEY
+AWS_STORAGE_BUCKET_NAME = SPACES_BUCKET_NAME
+AWS_S3_ENDPOINT_URL = SPACES_ENDPOINT_URL
+AWS_S3_CUSTOM_DOMAIN = f'{SPACES_BUCKET_NAME}.{SPACES_REGION_NAME}.cdn.digitaloceanspaces.com'
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+AWS_DEFAULT_ACL = 'public-read'
+AWS_LOCATION = 'media'
+
+# File Storage Configuration
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'

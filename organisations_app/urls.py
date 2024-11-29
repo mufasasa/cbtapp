@@ -31,7 +31,7 @@ urlpatterns = [
 
     path('exam/<uuid:exam_id>/candidate/<uuid:candidate_id>/extend_time/', ExtendCandidateExamTimeView.as_view(), name='extend_candidate_exam_time'),
 
-    path('exam/<uuid:exam_id>/question/<uuid:question_id>/analysis/', QuestionAnalysisReportView.as_view(), name='question_analysis_report'),
+    path('question/<uuid:question_id>/analysis/', QuestionAnalysisReportView.as_view(), name='question_analysis_report'),
     path('exam/<uuid:exam_id>/analysis/', ExamAnalysisReportView.as_view(), name='exam_analysis_report'),
     
 
