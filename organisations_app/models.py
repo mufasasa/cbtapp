@@ -148,10 +148,10 @@ class Question(models.Model):
 
     def is_correct(self, answer):
         if self.question_type in ['multiple_choice', 'true_false']:
-            return answer == self.correct_answer.get('answer')
+            return answer.get('id') == self.correct_answer.get('answer')
         elif self.question_type == 'multiple_select':
             correct_answers = set(self.correct_answer.get('answers', []))
-            given_answers = set(answer)
+            given_answers = set(answer.get('id') for answer in answer)
             return correct_answers == given_answers
         return False
 

@@ -42,11 +42,11 @@ class SubmitCandidateExam(generics.UpdateAPIView):
         
         exam = candidate_exam.examination
         
-        submitted_answers = request.data.get('answers', [])
+        submitted_answers = request.data.get('questions', [])
         
         for answer_data in submitted_answers:
-            question_id = answer_data.get('question_id')
-            answer = answer_data.get('answer')
+            question_id = answer_data.get('id')
+            answer = answer_data.get('response')
             
             question = Question.objects.get(id=question_id, examination=exam)
             
