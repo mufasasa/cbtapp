@@ -360,15 +360,18 @@ class CandidateExam(models.Model):
         }
 
         for question in self.examination.questions.all():
-            answer = CandidateAnswer.objects.filter(candidate=self.candidate, question__id=question['id']).first()
+            answer = CandidateAnswer.objects.filter(candidate=self.candidate, question=question).first()
             if answer:
                 report['questions_answered'].append({
-                    'question_id': question['id'],
+                    'question_id': str(question.id),
                     'score': answer.score,
-                    'max_score': question['marks']
+                    'max_score': question.marks
                 })
             else:
-                report['questions_unanswered'].append(question['id'])
+                report['questions_unanswered'].append({
+                    'question_id': str(question.id),
+                    'max_score': question.marks
+                })
 
         report['total_answered'] = len(report['questions_answered'])
         report['total_unanswered'] = len(report['questions_unanswered'])
