@@ -817,15 +817,12 @@ class CandidateAnalysisReportView(generics.RetrieveAPIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [TimedAuthTokenAuthentication]
 
-    def get(self, request, candidate_id, exam_id):
+    def get(self, request, candidate_exam_id):
         try:
-            candidate = Candidate.objects.get(pk=candidate_id)
-            exam = Examination.objects.get(pk=exam_id)
-            
-            if not user_is_staff_of_organization(request.user, exam.organisation):
+            candidate_exam = CandidateExam.objects.get(pk=candidate_exam_id)
+
+            if not user_is_staff_of_organization(request.user, candidate_exam.examination.organisation):
                 return Response({"error": "You don't have permission to access this report."}, status=status.HTTP_403_FORBIDDEN)
-            
-            candidate_exam = CandidateExam.objects.get(examination=exam, candidate=candidate)
             
             report = candidate_exam.get_analysis_report()
             return Response(report, status=status.HTTP_200_OK)

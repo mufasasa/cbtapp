@@ -22,7 +22,7 @@ urlpatterns = [
     path('exam/<uuid:exam_id>/admitted_candidates_count/', RetrieveAdmittedCandidatesCount.as_view(), name='admitted_candidates_count'),
 
     path('candidate_exam/<uuid:candidate_exam_id>/', CandidateExamDetailView.as_view(), name='candidate_exam_detail'),
-    path('candidate_exam/<uuid:candidate_id>/<uuid:exam_id>/analysis/', CandidateAnalysisReportView.as_view(), name='candidate_exam_analysis_report'),
+    path('candidate_exam/<uuid:candidate_exam_id>/analysis/', CandidateAnalysisReportView.as_view(), name='candidate_exam_analysis_report'),
 
     path('organisation/<uuid:organisation_id>/deactivate/', DeactivateOrganisationAccount.as_view(), name='deactivate_organisation'),
 
