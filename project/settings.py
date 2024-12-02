@@ -179,7 +179,7 @@ SPACES_ACCESS_KEY_ID = config('SPACES_ACCESS_KEY_ID')
 SPACES_SECRET_ACCESS_KEY = config('SPACES_SECRET_ACCESS_KEY')
 
 # Spaces configurations
-SPACES_BUCKET_NAME = 'cbt-app-bucket'
+SPACES_BUCKET_NAME = 'cbt-app-bucket-0'
 SPACES_REGION_NAME = 'fra1'  # Frankfurt region
 SPACES_ENDPOINT_URL = f'https://{SPACES_REGION_NAME}.digitaloceanspaces.com'
 SPACES_CDN_ENDPOINT_URL = f'https://{SPACES_BUCKET_NAME}.{SPACES_REGION_NAME}.cdn.digitaloceanspaces.com'
