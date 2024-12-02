@@ -375,7 +375,8 @@ class CandidateExam(models.Model):
                 report['questions_answered'].append({
                     'question_id': str(question.id),
                     'score': answer.score,
-                    'max_score': question.marks
+                    'max_score': question.marks,
+                    'answer': answer.answer
                 })
             else:
                 report['questions_unanswered'].append({
