@@ -199,3 +199,11 @@ AWS_LOCATION = 'media'
 # File Storage Configuration
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
+
+AWS_S3_OBJECT_PARAMETERS = {
+    'ACL': 'public-read',
+    'CacheControl': 'max-age=86400',
+}
+
+AWS_LOCATION = 'media'
+AWS_QUERYSTRING_AUTH = False 
