@@ -132,6 +132,7 @@ class Examination(models.Model):
 
 
 class Question(models.Model):
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     examination = models.ForeignKey(Examination, on_delete=models.CASCADE, related_name='questions')
     question_text = models.TextField()
@@ -182,6 +183,7 @@ class Question(models.Model):
 
         candidate_exams = CandidateExam.objects.filter(examination=self.examination)
         analysis['total_candidates'] = candidate_exams.count()
+
 
         for candidate_exam in candidate_exams:
             candidate_answer = CandidateAnswer.objects.filter(candidate=candidate_exam.candidate, question=self).first()
@@ -350,7 +352,15 @@ class CandidateExam(models.Model):
     
 
     def get_analysis_report(self):
+        from candidates_app.serializers import CandidateSummarySerializer
+        from organisations_app.serializers import ExaminationSerializer
+
+        candidate_serializer = CandidateSummarySerializer(self.candidate)
+        examination_serializer = ExaminationSerializer(self.examination)
+
         report = {
+            'candidate': candidate_serializer.data,
+            'examination': examination_serializer.data,
             'candidate_score': self.score,
             'questions_answered': [],
             'questions_unanswered': [],
