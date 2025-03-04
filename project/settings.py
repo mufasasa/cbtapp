@@ -179,40 +179,31 @@ SPECTACULAR_SETTINGS = {
     # OTHER SETTINGS
 }
 
-
 # DigitalOcean Spaces Configuration
-# USE_SPACES = True
+USE_SPACES = True
 
 # Spaces credentials
-# SPACES_ACCESS_KEY_ID = config('SPACES_ACCESS_KEY_ID')
-# SPACES_SECRET_ACCESS_KEY = config('SPACES_SECRET_ACCESS_KEY')
+SPACES_ACCESS_KEY_ID = config('SPACES_ACCESS_KEY_ID')
+SPACES_SECRET_ACCESS_KEY = config('SPACES_SECRET_ACCESS_KEY')
 
-# # Spaces configurations
-# SPACES_BUCKET_NAME = 'cbt-app-bucket-0'
-# SPACES_REGION_NAME = 'fra1'  # Frankfurt region
-# SPACES_ENDPOINT_URL = f'https://{SPACES_REGION_NAME}.digitaloceanspaces.com'
-# SPACES_CDN_ENDPOINT_URL = f'https://{SPACES_BUCKET_NAME}.{SPACES_REGION_NAME}.cdn.digitaloceanspaces.com'
+# Spaces configurations
+SPACES_BUCKET_NAME = 'cbt-app-files'
+SPACES_REGION_NAME = 'fra1'  # Frankfurt region
+SPACES_ENDPOINT_URL = f'https://{SPACES_REGION_NAME}.digitaloceanspaces.com'
+SPACES_CDN_ENDPOINT_URL = f'https://{SPACES_BUCKET_NAME}.{SPACES_REGION_NAME}.cdn.digitaloceanspaces.com'
 
-# # Django Storages Configuration
-# AWS_ACCESS_KEY_ID = SPACES_ACCESS_KEY_ID  # django-storages uses AWS naming
-# AWS_SECRET_ACCESS_KEY = SPACES_SECRET_ACCESS_KEY
-# AWS_STORAGE_BUCKET_NAME = SPACES_BUCKET_NAME
-# AWS_S3_ENDPOINT_URL = SPACES_ENDPOINT_URL
-# AWS_S3_CUSTOM_DOMAIN = f'{SPACES_BUCKET_NAME}.{SPACES_REGION_NAME}.cdn.digitaloceanspaces.com'
-# AWS_S3_OBJECT_PARAMETERS = {
-#     'CacheControl': 'max-age=86400',
-# }
-# AWS_DEFAULT_ACL = 'public-read'
-# AWS_LOCATION = 'media'
+# Django Storages Configuration
+AWS_ACCESS_KEY_ID = SPACES_ACCESS_KEY_ID  # django-storages uses AWS naming
+AWS_SECRET_ACCESS_KEY = SPACES_SECRET_ACCESS_KEY
+AWS_STORAGE_BUCKET_NAME = SPACES_BUCKET_NAME
+AWS_S3_ENDPOINT_URL = SPACES_ENDPOINT_URL
+AWS_S3_CUSTOM_DOMAIN = f'{SPACES_BUCKET_NAME}.{SPACES_REGION_NAME}.digitaloceanspaces.com'
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+AWS_DEFAULT_ACL = 'public-read'
+AWS_LOCATION = 'media'
 
-# # File Storage Configuration
-# DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-# MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
-
-# AWS_S3_OBJECT_PARAMETERS = {
-#     'ACL': 'public-read',
-#     'CacheControl': 'max-age=86400',
-# }
-
-# AWS_LOCATION = 'media'
-# AWS_QUERYSTRING_AUTH = False 
+# File Storage Configuration
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
