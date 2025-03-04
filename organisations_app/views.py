@@ -7,6 +7,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from authentication.authentication import TimedAuthTokenAuthentication
 from authentication.utils  import user_is_in_entity, get_user_entity_instance, user_is_staff_of_organization
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.pagination import PageNumberPagination
 from utills_app.serializers import FileUploadSerializer
 from utills_app.models import FileUpload
@@ -18,6 +19,22 @@ import pandas as pd
 
 
 
+@extend_schema_view(
+    get=extend_schema(
+        tags=["Organisation"],
+        description=("Retrieval of all Organisations with advanced filtering options."),
+        responses={
+            200: OrganisationSerializer(many=True),
+        },
+    ),
+    post=extend_schema(
+        tags=["Organisation"],
+        description=("Creation of an Organisation."),
+        responses={
+            201: OrganisationCreateSerializer(),
+        },
+    ),
+)
 class OrganisationListCreateView(generics.ListCreateAPIView):
     queryset = Organisation.objects.all()
     
