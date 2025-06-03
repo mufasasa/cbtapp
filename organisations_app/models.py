@@ -387,9 +387,8 @@ class CandidateExam(models.Model):
         report['total_answered'] = len(report['questions_answered'])
         report['total_unanswered'] = len(report['questions_unanswered'])
 
-        if self.score is not None and self.examination.total_marks > 0:
-            score_percentage = (self.score / self.examination.total_marks) * 100
-            report['passed'] = score_percentage >= self.examination.passing_marks
+        if self.score is not None:
+            report['passed'] = self.score >= self.examination.passing_marks
 
         # Get overall exam statistics
         all_candidate_exams = CandidateExam.objects.filter(examination=self.examination)
